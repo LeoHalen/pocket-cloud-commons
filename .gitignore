@@ -1,0 +1,13 @@
+.git
+logs
+target/
+
+.project
+.settings
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+
