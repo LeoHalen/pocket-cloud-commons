@@ -51,7 +51,7 @@
         <versions-maven-plugin.version>2.7</versions-maven-plugin.version>
 
         <!-- spring related version -->
-        <spring-boot.version>2.3.1.RELEASE</spring-boot.version>
+        <spring-boot.version>2.5.1</spring-boot.version>
         <spring-cloud.version>Hoxton.SR6</spring-cloud.version>
         <spring-cloud-alibaba.version>2.2.1.RELEASE</spring-cloud-alibaba.version>
     </properties>
@@ -79,8 +79,8 @@
     <repositories>
         <repository>
             <id>alimaven</id>
-            <name>aliyun maven</name>
-            <url>http://maven.aliyun.com/nexus/content/groups/public/</url>
+            <name>aliyun maven spring</name>
+            <url>https://maven.aliyun.com/repository/spring</url>
             <releases>
                 <enabled>true</enabled>
             </releases>
@@ -91,7 +91,7 @@
         <repository>
             <id>activiti-repos2</id>
             <name>Activiti Repository 2</name>
-            <url>https://app.camunda.com/nexus/content/groups/public</url>
+            <url>https://app.camunda.com/nexus/repository/public/</url>
             <releases>
                 <enabled>true</enabled>
             </releases>
@@ -113,7 +113,7 @@
         <repository>
             <id>spring-milestones</id>
             <name>Spring Milestones</name>
-            <url>https://repo.spring.io/libs-milestone</url>
+            <url>https://repo.spring.io/libs-milestone/</url>
             <releases>
                 <enabled>true</enabled>
             </releases>
@@ -123,8 +123,8 @@
         </repository>
         <repository>
             <id>oss-public</id>
-            <name>Oss Public Repository</name>
-            <url>https://oss.sonatype.org/content/repositories/public</url>
+            <name>Oss releases Repository</name>
+            <url>https://oss.sonatype.org/content/repositories/releases/</url>
             <releases>
                 <enabled>true</enabled>
             </releases>
@@ -135,7 +135,7 @@
         <repository>
             <id>central-repos</id>
             <name>Central Repository</name>
-            <url>http://repo.maven.apache.org/maven2</url>
+            <url>https://repo.maven.apache.org/maven2/</url>
             <releases>
                 <enabled>true</enabled>
             </releases>
@@ -144,6 +144,13 @@
             </snapshots>
         </repository>
     </repositories>
+
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>2.5.1</version>
+        <relativePath/>
+    </parent>
 
     <dependencyManagement>
         <dependencies>
