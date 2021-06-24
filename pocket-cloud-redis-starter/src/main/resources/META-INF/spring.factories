@@ -1,0 +1,3 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+com.bokecc.common.redis.RedisAutoConfiguration,\
+com.bokecc.common.redis.templete.RedisRepository
