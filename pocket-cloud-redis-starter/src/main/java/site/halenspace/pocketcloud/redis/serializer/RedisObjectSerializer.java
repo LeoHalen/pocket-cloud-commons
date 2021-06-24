@@ -20,7 +20,7 @@ import java.time.format.DateTimeFormatter;
  */
 public class RedisObjectSerializer extends Jackson2JsonRedisSerializer<Object> {
 
-    protected final static String YMDHMS_DATE_TIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
+    protected final static String NORM_DATETIME_PATTERN = "yyyy-MM-dd HH:mm:ss";
 
     public RedisObjectSerializer() {
         super(Object.class);
@@ -30,12 +30,12 @@ public class RedisObjectSerializer extends Jackson2JsonRedisSerializer<Object> {
                 .activateDefaultTyping(LaissezFaireSubTypeValidator.instance, ObjectMapper.DefaultTyping.NON_FINAL)
                 .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
                 .configure(JsonParser.Feature.ALLOW_BACKSLASH_ESCAPING_ANY_CHARACTER, true)
-                .setDateFormat(new SimpleDateFormat(YMDHMS_DATE_TIME_FORMAT));
+                .setDateFormat(new SimpleDateFormat(NORM_DATETIME_PATTERN));
         SimpleModule simpleModule = new SimpleModule()
                 // 枚举转换器
 //                .addDeserializer(Enum.class, EnumDeserializer.INSTANCE)
-                .addSerializer(LocalDateTime.class, new LocalDateTimeSerializer(DateTimeFormatter.ofPattern(YMDHMS_DATE_TIME_FORMAT)))
-                .addDeserializer(LocalDateTime.class, new LocalDateTimeDeserializer(DateTimeFormatter.ofPattern(YMDHMS_DATE_TIME_FORMAT)));
+                .addSerializer(LocalDateTime.class, new LocalDateTimeSerializer(DateTimeFormatter.ofPattern(NORM_DATETIME_PATTERN)))
+                .addDeserializer(LocalDateTime.class, new LocalDateTimeDeserializer(DateTimeFormatter.ofPattern(NORM_DATETIME_PATTERN)));
         om.registerModule(simpleModule);
         this.setObjectMapper(om);
 

@@ -54,6 +54,11 @@
         <spring-boot.version>2.5.1</spring-boot.version>
         <spring-cloud.version>Hoxton.SR6</spring-cloud.version>
         <spring-cloud-alibaba.version>2.2.1.RELEASE</spring-cloud-alibaba.version>
+
+        <!-- tool -->
+        <hutool-core.version>5.7.2</hutool-core.version>
+        <guava.version>30.1.1-jre</guava.version>
+        <commons-lang3.version>3.12.0</commons-lang3.version>
     </properties>
 
     <licenses>
@@ -79,8 +84,8 @@
     <repositories>
         <repository>
             <id>alimaven</id>
-            <name>aliyun maven spring</name>
-            <url>https://maven.aliyun.com/repository/spring</url>
+            <name>aliyun maven public</name>
+            <url>https://maven.aliyun.com/repository/public</url>
             <releases>
                 <enabled>true</enabled>
             </releases>
@@ -180,10 +185,6 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-        </dependency>
-        <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
             <scope>compile</scope>
@@ -191,11 +192,19 @@
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
+            <version>${commons-lang3.version}</version>
         </dependency>
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
+            <version>${guava.version}</version>
         </dependency>
+        <dependency>
+            <groupId>cn.hutool</groupId>
+            <artifactId>hutool-core</artifactId>
+            <version>${hutool-core.version}</version>
+        </dependency>
+
     </dependencies>
 
     <build>
