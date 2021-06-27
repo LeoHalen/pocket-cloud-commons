@@ -11,7 +11,7 @@
         <module>pocket-cloud-core</module>
         <module>pocket-cloud-redis-starter</module>
         <module>pocket-cloud-logs-starter</module>
-        <module>pocket-cloud-dynamic-thread-pool-starter</module>
+        <module>pocket-cloud-thread-pool-starter</module>
     </modules>
     <packaging>pom</packaging>
 
