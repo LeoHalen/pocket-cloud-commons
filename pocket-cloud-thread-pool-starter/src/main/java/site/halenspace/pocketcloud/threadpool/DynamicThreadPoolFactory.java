@@ -17,7 +17,7 @@ import java.util.concurrent.*;
  * @Github https://github.com/LeoHalen
  */
 @Slf4j
-public class DynamicThreadPoolFactory {
+public class DynamicThreadPoolFactory implements ThreadPoolFactory {
 
     /**
      * 线程池名称容器

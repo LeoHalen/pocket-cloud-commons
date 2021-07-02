@@ -72,4 +72,10 @@ public class ThreadPoolProperties {
      * 队列容量告警阀值, 默认为队列容量
      */
     private int queueCapacityThreshold = queueCapacity;
+
+    /**
+     * 懒加载模式开关, 默认打开
+     * @Describe 懒加载模式打开后，线程池执行器的初始化时机为第一次获取时
+     */
+    private boolean lazyModeEnabled = true;
 }
