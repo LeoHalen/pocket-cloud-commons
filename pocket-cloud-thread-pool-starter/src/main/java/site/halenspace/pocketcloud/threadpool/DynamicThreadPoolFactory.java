@@ -10,26 +10,22 @@ import java.util.Set;
 import java.util.concurrent.*;
 
 /**
- * 动态线程池工厂
+ * 动态线程池工厂类
  *
- * @Author Halen.Leo · 2021/6/30
- * @Blogger 后起小生
- * @Github https://github.com/LeoHalen
+ * @author Halen.Leo · 2021/6/30
+ * @blogger 后起小生
+ * @github https://github.com/LeoHalen
  */
 @Slf4j
-public class DynamicThreadPoolFactory implements ThreadPoolFactory {
+public class DynamicThreadPoolFactory implements ThreadPoolFactory<DynamicThreadPoolExecutor, ThreadPoolProperties> {
 
     /**
      * 线程池名称容器
      */
     private static final Set<String> THREAD_POOL_NAME_SET = new HashSet<>();
 
-    /**
-     * 创建线程池
-     * @param properties
-     * @return
-     */
-    public DynamicThreadPoolExecutor createThreadPool(ThreadPoolProperties properties) {
+    @Override
+    public DynamicThreadPoolExecutor create(ThreadPoolProperties properties) {
         String threadPoolName = properties.getThreadPoolName();
 
         synchronized (THREAD_POOL_NAME_SET) {
@@ -49,7 +45,7 @@ public class DynamicThreadPoolFactory implements ThreadPoolFactory {
                 buildThreadFactory(threadPoolName),
                 properties.getRejectedExecutionType());
         log.info("Dynamic thread pool factory: initialize {}(" +
-                "corePoolSize={},maximumPoolSize={},keepAliveTime={},timeUnit={},queue={},rejectedExecution={})",
+                        "corePoolSize={},maximumPoolSize={},keepAliveTime={},timeUnit={},queue={},rejectedExecution={})",
                 threadPoolName, properties.getCorePoolSize(), properties.getMaximumPoolSize(), properties.getKeepAliveTime(),
                 properties.getTimeUnit(), properties.getQueueType(), properties.getRejectedExecutionType());
         return dynamicThreadPoolExecutor;
@@ -80,4 +76,5 @@ public class DynamicThreadPoolFactory implements ThreadPoolFactory {
 
         return new ArrayBlockingQueue<>(queueCapacity);
     }
+
 }
