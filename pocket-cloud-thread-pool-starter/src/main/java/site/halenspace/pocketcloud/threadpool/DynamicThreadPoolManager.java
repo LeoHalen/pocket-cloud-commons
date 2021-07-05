@@ -10,7 +10,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 /**
- *
+ * 动态线程池管理器
  *
  * @Author Halen.Leo · 2021/7/2
  * @Blogger 后起小生
@@ -29,6 +29,9 @@ public class DynamicThreadPoolManager {
      */
     private static final ConcurrentMap<String, DynamicThreadPoolExecutor> executorContainer = new ConcurrentHashMap<>();
 
+    /**
+     * 线程池工厂
+     */
     private static final ThreadPoolFactory<DynamicThreadPoolExecutor, ThreadPoolProperties> threadPoolFactory = new DynamicThreadPoolFactory();
 
     /**
@@ -54,7 +57,17 @@ public class DynamicThreadPoolManager {
      * @param threadPoolName
      * @return
      */
-    public DynamicThreadPoolExecutor getThreadPoolExecutor(String threadPoolName) {
+    public DynamicThreadPoolExecutor getExecutor(String threadPoolName) {
+        return executorContainer.get(threadPoolName);
+    }
+
+    /**
+     * 通过名称获取线程池执行器, 如果不存在则创建
+     *
+     * @param threadPoolName
+     * @return
+     */
+    public DynamicThreadPoolExecutor getExecutorIfEmptyCreate(String threadPoolName) {
 
         DynamicThreadPoolExecutor threadPoolExecutor = executorContainer.get(threadPoolName);
         if (threadPoolExecutor != null) {
@@ -65,6 +78,11 @@ public class DynamicThreadPoolManager {
         defaultConfigProperties.setThreadPoolName(threadPoolName);
 
         return createAndCacheExecutor(properties);
+    }
+
+    private void checkThreadPoolProperties(ThreadPoolProperties properties) {
+        assert properties != null;
+
     }
 
     /**
@@ -88,8 +106,19 @@ public class DynamicThreadPoolManager {
         return dynamicThreadPoolExecutor;
     }
 
-    private void checkThreadPoolProperties(ThreadPoolProperties properties) {
-        assert properties != null;
+    public synchronized void refreshExecutor(ThreadPoolProperties properties) {
+        if (!executorContainer.containsKey(properties.getThreadPoolName())) {
+            log.warn("The thread pool name '{}' doesn't exists, do not need to refresh.", properties.getThreadPoolName());
+            return;
+        }
 
+        DynamicThreadPoolExecutor threadPoolExecutor = executorContainer.get(properties.getThreadPoolName());
+    }
+
+    private void doRefresh(DynamicThreadPoolExecutor executor, ThreadPoolProperties properties) {
+        executor.setCorePoolSize();
+        executor.setMaximumPoolSize();
+        executor.setKeepAliveTime();
+        executor.setRejectedExecutionHandler();
     }
 }

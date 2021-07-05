@@ -18,12 +18,12 @@ public class DynamicThreadPoolExecutor extends ThreadPoolExecutor {
     }
 
     public DynamicThreadPoolExecutor(int corePoolSize, int maximumPoolSize, long keepAliveTime, TimeUnit unit,
-                                     BlockingQueue<Runnable> workQueue, ThreadFactory threadFactory, String threadPoolNamePrefix) {
+                                     BlockingQueue<Runnable> workQueue, ThreadFactory threadFactory) {
         super(corePoolSize, maximumPoolSize, keepAliveTime, unit, workQueue, threadFactory);
     }
 
     public DynamicThreadPoolExecutor(int corePoolSize, int maximumPoolSize, long keepAliveTime, TimeUnit unit,
-                                     BlockingQueue<Runnable> workQueue, RejectedExecutionHandler handler, String threadPoolNamePrefix) {
+                                     BlockingQueue<Runnable> workQueue, RejectedExecutionHandler handler) {
         super(corePoolSize, maximumPoolSize, keepAliveTime, unit, workQueue, handler);
     }
 
