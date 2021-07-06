@@ -2,12 +2,13 @@ package site.halenspace.pocketcloud.threadpool;
 
 import cn.hutool.core.thread.ThreadFactoryBuilder;
 import lombok.extern.slf4j.Slf4j;
-import site.halenspace.pocketcloud.threadpool.consts.QueueTypeConst;
+import site.halenspace.pocketcloud.threadpool.builder.ExecutorBlockingQueueBuilder;
+import site.halenspace.pocketcloud.threadpool.builder.RejectedExecutionBuilder;
 import site.halenspace.pocketcloud.threadpool.properties.ThreadPoolProperties;
 
 import java.util.HashSet;
 import java.util.Set;
-import java.util.concurrent.*;
+import java.util.concurrent.ThreadFactory;
 
 /**
  * 动态线程池工厂类
@@ -41,9 +42,9 @@ public class DynamicThreadPoolFactory implements ThreadPoolFactory<DynamicThread
                 properties.getMaximumPoolSize(),
                 properties.getKeepAliveTime(),
                 properties.getTimeUnit(),
-                buildQueue(properties.getQueueType(), properties.getQueueCapacity(), properties.isFair()),
+                ExecutorBlockingQueueBuilder.build(properties.getQueueType(), properties.getQueueCapacity(), properties.isFair()),
                 buildThreadFactory(threadPoolName),
-                properties.getRejectedExecutionType());
+                RejectedExecutionBuilder.build(properties.getRejectedExecutionType()));
         log.info("Dynamic thread pool factory: initialize {}(" +
                         "corePoolSize={},maximumPoolSize={},keepAliveTime={},timeUnit={},queue={},rejectedExecution={})",
                 threadPoolName, properties.getCorePoolSize(), properties.getMaximumPoolSize(), properties.getKeepAliveTime(),
@@ -55,26 +56,6 @@ public class DynamicThreadPoolFactory implements ThreadPoolFactory<DynamicThread
         return ThreadFactoryBuilder.create()
                 .setNamePrefix(threadPoolNamePrefix + "-")
                 .setDaemon(true).build();
-    }
-
-    private BlockingQueue<Runnable> buildQueue(String queueType, int queueCapacity, boolean fair) {
-
-        switch (queueType) {
-            case QueueTypeConst.ArrayBlockingQueue:
-                return new ArrayBlockingQueue<>(queueCapacity);
-            case QueueTypeConst.LinkedBlockingQueue:
-                return new LinkedBlockingQueue<>(queueCapacity);
-            case QueueTypeConst.LinkedBlockingDeque:
-                return new LinkedBlockingDeque<>(queueCapacity);
-            case QueueTypeConst.DelayQueue:
-                return new DelayQueue();
-            case QueueTypeConst.SynchronousQueue:
-                return new SynchronousQueue<>(fair);
-            case QueueTypeConst.PriorityBlockingQueue:
-                return new PriorityBlockingQueue<>();
-        }
-
-        return new ArrayBlockingQueue<>(queueCapacity);
     }
 
 }

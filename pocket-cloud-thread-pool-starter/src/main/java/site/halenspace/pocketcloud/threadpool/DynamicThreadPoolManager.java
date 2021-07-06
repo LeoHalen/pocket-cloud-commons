@@ -2,6 +2,7 @@ package site.halenspace.pocketcloud.threadpool;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import site.halenspace.pocketcloud.threadpool.builder.RejectedExecutionBuilder;
 import site.halenspace.pocketcloud.threadpool.exeception.ExecutorCreateFailureException;
 import site.halenspace.pocketcloud.threadpool.properties.ThreadPoolProperties;
 
@@ -67,7 +68,7 @@ public class DynamicThreadPoolManager {
      * @param threadPoolName
      * @return
      */
-    public DynamicThreadPoolExecutor getExecutorIfEmptyCreate(String threadPoolName) {
+    public DynamicThreadPoolExecutor getExecutorIfNullCreate(String threadPoolName) {
 
         DynamicThreadPoolExecutor threadPoolExecutor = executorContainer.get(threadPoolName);
         if (threadPoolExecutor != null) {
@@ -113,12 +114,14 @@ public class DynamicThreadPoolManager {
         }
 
         DynamicThreadPoolExecutor threadPoolExecutor = executorContainer.get(properties.getThreadPoolName());
+
+        doRefresh(threadPoolExecutor, properties);
     }
 
     private void doRefresh(DynamicThreadPoolExecutor executor, ThreadPoolProperties properties) {
-        executor.setCorePoolSize();
-        executor.setMaximumPoolSize();
-        executor.setKeepAliveTime();
-        executor.setRejectedExecutionHandler();
+        executor.setCorePoolSize(properties.getCorePoolSize());
+        executor.setMaximumPoolSize(properties.getMaximumPoolSize());
+        executor.setKeepAliveTime(properties.getKeepAliveTime(), properties.getTimeUnit());
+        executor.setRejectedExecutionHandler(RejectedExecutionBuilder.build(properties.getRejectedExecutionType()));
     }
 }

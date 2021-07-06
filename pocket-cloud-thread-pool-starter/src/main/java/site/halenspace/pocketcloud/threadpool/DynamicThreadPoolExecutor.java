@@ -2,6 +2,7 @@ package site.halenspace.pocketcloud.threadpool;
 
 
 import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * 支持动态设置参数的线程池
@@ -32,4 +33,28 @@ public class DynamicThreadPoolExecutor extends ThreadPoolExecutor {
         super(corePoolSize, maximumPoolSize, keepAliveTime, unit, workQueue, threadFactory, handler);
     }
 
+    public static class DynamicDiscardPolicy implements RejectedExecutionHandler {
+
+        private String threadPoolName;
+
+        /**
+         * Creates an {@code AbortPolicy}.
+         */
+        public DynamicDiscardPolicy() { }
+
+        public DynamicDiscardPolicy(String threadPoolName) {
+            this.threadPoolName = threadPoolName;
+        }
+
+        /**
+         * Always throws RejectedExecutionException.
+         *
+         * @param r the runnable task requested to be executed
+         * @param e the executor attempting to execute this task
+         * @throws RejectedExecutionException always
+         */
+        public void rejectedExecution(Runnable r, ThreadPoolExecutor e) {
+            throw new RejectedExecutionException("Task " + r.toString() + " rejected from " + e.toString());
+        }
+    }
 }
