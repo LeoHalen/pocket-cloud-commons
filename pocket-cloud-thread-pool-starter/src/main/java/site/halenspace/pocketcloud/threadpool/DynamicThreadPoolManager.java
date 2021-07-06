@@ -53,6 +53,16 @@ public class DynamicThreadPoolManager {
     }
 
     /**
+     * 判断线程池是否存在
+     *
+     * @param threadPoolName
+     * @return
+     */
+    public boolean contains(String threadPoolName) {
+        return executorContainer.containsKey(threadPoolName);
+    }
+
+    /**
      * 通过名称获取线程池执行器
      *
      * @param threadPoolName
@@ -78,7 +88,7 @@ public class DynamicThreadPoolManager {
         ThreadPoolProperties defaultConfigProperties = new ThreadPoolProperties();
         defaultConfigProperties.setThreadPoolName(threadPoolName);
 
-        return createAndCacheExecutor(properties);
+        return createAndCacheExecutor(defaultConfigProperties);
     }
 
     private void checkThreadPoolProperties(ThreadPoolProperties properties) {
