@@ -28,6 +28,11 @@ public class TestExecutorController {
 
         executor.execute(() -> {
             String currentThreadName = Thread.currentThread().getName();
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
             System.out.println("当前线程名：" + currentThreadName);
         });
     }

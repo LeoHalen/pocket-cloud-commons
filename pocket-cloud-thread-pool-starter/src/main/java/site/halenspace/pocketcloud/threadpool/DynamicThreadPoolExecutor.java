@@ -2,7 +2,6 @@ package site.halenspace.pocketcloud.threadpool;
 
 
 import java.util.concurrent.*;
-import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * 支持动态设置参数的线程池

@@ -1,0 +1,19 @@
+server:
+    port: 9090
+spring:
+  application:
+    name: dynamic-thread-pool-service
+
+
+pocket:
+  dynamic-thread-pool:
+    enabled: true
+    threadPoolName: testExecutor
+    corePoolSize: 1
+    maximumPoolSize: 2
+    keepAliveTime: 5000
+    queueType: LinkedBlockingQueue
+    queueCapacity: 10
+    fair: true
+    rejectedExecutionType: AbortPolicy
+    lazyModeEnabled: true
