@@ -11,7 +11,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * 线程池参数配置
  *
- * @Author Halen.Leo · 2021/6/30
+ * @author Halen Leo · 2021/6/30
  * @Blogger 后起小生
  * @Github https://github.com/LeoHalen
  */

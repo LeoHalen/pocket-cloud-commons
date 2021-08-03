@@ -13,7 +13,7 @@ import java.util.concurrent.ConcurrentMap;
 /**
  * 动态线程池管理器
  *
- * @Author Halen.Leo · 2021/7/2
+ * @author Halen Leo · 2021/7/2
  * @Blogger 后起小生
  * @Github https://github.com/LeoHalen
  */

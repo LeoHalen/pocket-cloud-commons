@@ -7,7 +7,7 @@ import site.halenspace.pocketcloud.threadpool.properties.ThreadPoolProperties;
 /**
  * 动态线程池组件自动配置
  *
- * @Author Halen.Leo · 2021/6/30
+ * @author Halen Leo · 2021/6/30
  * @Blogger 后起小生
  * @Github https://github.com/LeoHalen
  */

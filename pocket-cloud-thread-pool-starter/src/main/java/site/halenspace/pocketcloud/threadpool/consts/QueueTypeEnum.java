@@ -3,7 +3,7 @@ package site.halenspace.pocketcloud.threadpool.consts;
 /**
  * 队列类型枚举
  *
- * @Author Halen.Leo · 2021/6/30
+ * @author Halen Leo · 2021/6/30
  * @Blogger 后起小生
  * @Github https://github.com/LeoHalen
  */

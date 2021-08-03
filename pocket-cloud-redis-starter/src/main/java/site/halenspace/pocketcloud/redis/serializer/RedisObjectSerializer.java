@@ -16,7 +16,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 /**
- * @Author Halen.Leo · 2020/6/23
+ * @author Halen Leo · 2020/6/23
  */
 public class RedisObjectSerializer extends Jackson2JsonRedisSerializer<Object> {
 

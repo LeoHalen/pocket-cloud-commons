@@ -5,7 +5,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Import;
 
 /**
- * @author Halen.Leo · 2021/7/6
+ * @author Halen Leo · 2021/7/6
  */
 @SpringBootApplication
 @Import(DynamicThreadPoolAutoConfiguration.class)

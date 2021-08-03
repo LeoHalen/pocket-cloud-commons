@@ -5,7 +5,7 @@ import site.halenspace.pocketcloud.threadpool.consts.QueueTypeConst;
 import site.halenspace.pocketcloud.threadpool.consts.RejectedExecutionHandlerTypeConst;
 
 /**
- * @author Halen.Leo · 2021/7/6
+ * @author Halen Leo · 2021/7/6
  */
 @Data
 public class UpdateThreadPoolReq {

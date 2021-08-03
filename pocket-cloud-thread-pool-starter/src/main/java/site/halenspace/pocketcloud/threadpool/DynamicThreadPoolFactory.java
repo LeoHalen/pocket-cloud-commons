@@ -13,7 +13,7 @@ import java.util.concurrent.ThreadFactory;
 /**
  * 动态线程池工厂类
  *
- * @author Halen.Leo · 2021/6/30
+ * @author Halen Leo · 2021/6/30
  * @blogger 后起小生
  * @github https://github.com/LeoHalen
  */

@@ -24,7 +24,7 @@ import java.util.Map;
 import java.util.StringJoiner;
 
 /**
- * @Author Halen.Leo · 2020/6/22
+ * @author Halen Leo · 2020/6/22
  */
 @ConditionalOnProperty(name = "pocket.cache-manager.enabled", matchIfMissing = true)
 @EnableConfigurationProperties(CacheManagerProperties.class)

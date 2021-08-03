@@ -8,7 +8,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 /**
- * @author Halen.Leo · 2021/7/6
+ * @author Halen Leo · 2021/7/6
  */
 //@RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest(classes = { TestApplication.class, DynamicThreadPoolAutoConfiguration.class})

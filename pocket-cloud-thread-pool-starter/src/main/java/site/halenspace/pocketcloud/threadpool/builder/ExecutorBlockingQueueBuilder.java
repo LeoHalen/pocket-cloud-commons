@@ -9,7 +9,7 @@ import java.util.concurrent.*;
 /**
  * 线程池执行器阻塞队列构建
  *
- * @author Halen.Leo · 2021/7/6
+ * @author Halen Leo · 2021/7/6
  */
 public class ExecutorBlockingQueueBuilder {
 
