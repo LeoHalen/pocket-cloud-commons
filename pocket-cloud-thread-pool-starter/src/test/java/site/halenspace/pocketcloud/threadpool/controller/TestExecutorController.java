@@ -17,14 +17,11 @@ import site.halenspace.pocketcloud.threadpool.request.UpdateThreadPoolReq;
 @RequestMapping("/test")
 public class TestExecutorController {
 
-    @Autowired
-    private DynamicThreadPoolManager dynamicThreadPoolManager;
-
     private static final String threadPoolName = "testExecutor";
 
     @GetMapping("executor")
     public void testController() {
-        DynamicThreadPoolExecutor executor = dynamicThreadPoolManager.getExecutorIfNullCreate(threadPoolName);
+        DynamicThreadPoolExecutor executor = DynamicThreadPoolManager.getInstance().getExecutorIfNullCreate(threadPoolName);
 
         executor.execute(() -> {
             String currentThreadName = Thread.currentThread().getName();
@@ -40,13 +37,13 @@ public class TestExecutorController {
     @PostMapping("executor")
     public String updateExecutorConfig(@RequestBody UpdateThreadPoolReq reqParam) {
 
-        if (!dynamicThreadPoolManager.contains(reqParam.getThreadPoolName())) {
+        if (!DynamicThreadPoolManager.getInstance().contains(reqParam.getThreadPoolName())) {
             return "不好意思让你失望了，你要找的它不存在！";
         }
 
         ThreadPoolProperties properties = new ThreadPoolProperties();
         BeanUtils.copyProperties(reqParam, properties);
-        dynamicThreadPoolManager.refreshExecutor(properties);
+        DynamicThreadPoolManager.getInstance().refreshExecutor(properties);
 
         return "修改成功";
     }

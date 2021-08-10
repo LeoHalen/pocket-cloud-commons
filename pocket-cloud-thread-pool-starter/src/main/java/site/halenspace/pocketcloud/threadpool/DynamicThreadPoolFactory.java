@@ -9,6 +9,8 @@ import site.halenspace.pocketcloud.threadpool.strategy.properties.factory.Dynami
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.RejectedExecutionHandler;
 import java.util.concurrent.ThreadFactory;
 
 /**
@@ -60,6 +62,15 @@ public class DynamicThreadPoolFactory implements
         return ThreadFactoryBuilder.create()
                 .setNamePrefix(threadPoolNamePrefix + "-")
                 .setDaemon(true).build();
+    }
+
+    public BlockingQueue<Runnable> buildBlockingQueue(ThreadPoolProperties properties) {
+        return ExecutorBlockingQueueBuilder
+                .build(properties.getQueueType(), properties.getQueueCapacity(), properties.isFair());
+    }
+
+    public RejectedExecutionHandler buildRejectedExecution(ThreadPoolProperties properties) {
+        return RejectedExecutionBuilder.build(properties.getRejectedExecutionType());
     }
 
 }
