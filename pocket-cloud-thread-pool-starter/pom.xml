@@ -32,6 +32,14 @@
            <artifactId>spring-boot-starter-test</artifactId>
        </dependency>
 
+       <!-- archaius -->
+       <dependency>
+           <groupId>com.netflix.archaius</groupId>
+           <artifactId>archaius-core</artifactId>
+           <version>0.7.7</version>
+       </dependency>
+
+
        <dependency>
            <groupId>org.projectlombok</groupId>
            <artifactId>lombok</artifactId>

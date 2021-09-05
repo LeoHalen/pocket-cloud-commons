@@ -6,14 +6,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import site.halenspace.pocketcloud.threadpool.DynamicThreadPoolExecutor;
 import site.halenspace.pocketcloud.threadpool.DynamicThreadPoolManager;
-import site.halenspace.pocketcloud.threadpool.properties.ThreadPoolProperties;
+import site.halenspace.pocketcloud.threadpool.strategy.properties.ThreadPoolProperties;
 import site.halenspace.pocketcloud.threadpool.request.UpdateThreadPoolReq;
 
 /**
  * @author Halen Leo · 2021/7/6
  */
 @Slf4j
-@RestController
+//@RestController
 @RequestMapping("/test")
 public class TestExecutorController {
 

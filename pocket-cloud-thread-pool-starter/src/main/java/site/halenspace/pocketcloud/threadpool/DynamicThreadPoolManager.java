@@ -1,10 +1,9 @@
 package site.halenspace.pocketcloud.threadpool;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
 import site.halenspace.pocketcloud.threadpool.builder.RejectedExecutionBuilder;
 import site.halenspace.pocketcloud.threadpool.exeception.ExecutorCreateFailureException;
-import site.halenspace.pocketcloud.threadpool.properties.ThreadPoolProperties;
+import site.halenspace.pocketcloud.threadpool.strategy.properties.DynamicThreadPoolProperties;
 
 import javax.annotation.PostConstruct;
 import java.util.concurrent.ConcurrentHashMap;
@@ -18,7 +17,7 @@ import java.util.concurrent.ConcurrentMap;
  * @Github https://github.com/LeoHalen
  */
 @Slf4j
-@Component
+//@Component
 public class DynamicThreadPoolManager {
 
     /**
@@ -33,14 +32,15 @@ public class DynamicThreadPoolManager {
     /**
      * 线程池工厂
      */
-    private static final ThreadPoolFactory<DynamicThreadPoolExecutor, ThreadPoolProperties> threadPoolFactory = new DynamicThreadPoolFactory();
+    private static final ThreadPoolFactory<DynamicThreadPoolExecutor,
+            DynamicThreadPoolKey, DynamicThreadPoolProperties.Setter> threadPoolFactory = new DynamicThreadPoolFactory();
 
     /**
      * 线程池配置参数
      */
-    private final ThreadPoolProperties properties;
+    private final DynamicThreadPoolProperties properties;
 
-    public DynamicThreadPoolManager(ThreadPoolProperties properties) {
+    public DynamicThreadPoolManager(DynamicThreadPoolProperties properties) {
         this.properties = properties;
     }
 
@@ -85,15 +85,13 @@ public class DynamicThreadPoolManager {
             return threadPoolExecutor;
         }
 
-        ThreadPoolProperties defaultConfigProperties = new ThreadPoolProperties();
-        defaultConfigProperties.setThreadPoolName(threadPoolName);
+        DynamicThreadPoolProperties defaultConfigProperties = new DynamicThreadPoolProperties(DynamicThreadPoolKey.Factory.asKey(threadPoolName));
 
         return createAndCacheExecutor(defaultConfigProperties);
     }
 
-    private void checkThreadPoolProperties(ThreadPoolProperties properties) {
+    private void checkDynamicThreadPoolProperties(DynamicThreadPoolProperties properties) {
         assert properties != null;
-
     }
 
     /**
@@ -103,9 +101,9 @@ public class DynamicThreadPoolManager {
      * @throws ExecutorCreateFailureException
      *          If the thread pool name is duplicated.
      */
-    private synchronized DynamicThreadPoolExecutor createAndCacheExecutor(ThreadPoolProperties properties) {
+    private synchronized DynamicThreadPoolExecutor createAndCacheExecutor(DynamicThreadPoolProperties properties) {
 
-        checkThreadPoolProperties(properties);
+        checkDynamicThreadPoolProperties(properties);
 
         if (executorContainer.containsKey(properties.getThreadPoolName())) {
             throw new ExecutorCreateFailureException("The thread pool name '" + properties.getThreadPoolName() + "' already exists.");
@@ -117,7 +115,7 @@ public class DynamicThreadPoolManager {
         return dynamicThreadPoolExecutor;
     }
 
-    public synchronized void refreshExecutor(ThreadPoolProperties properties) {
+    public synchronized void refreshExecutor(DynamicThreadPoolProperties properties) {
         if (!executorContainer.containsKey(properties.getThreadPoolName())) {
             log.warn("The thread pool name '{}' doesn't exists, do not need to refresh.", properties.getThreadPoolName());
             return;
@@ -128,7 +126,7 @@ public class DynamicThreadPoolManager {
         doRefresh(threadPoolExecutor, properties);
     }
 
-    private void doRefresh(DynamicThreadPoolExecutor executor, ThreadPoolProperties properties) {
+    private void doRefresh(DynamicThreadPoolExecutor executor, DynamicThreadPoolProperties properties) {
         executor.setCorePoolSize(properties.getCorePoolSize());
         executor.setMaximumPoolSize(properties.getMaximumPoolSize());
         executor.setKeepAliveTime(properties.getKeepAliveTime(), properties.getTimeUnit());

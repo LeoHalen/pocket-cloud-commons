@@ -7,12 +7,12 @@ package site.halenspace.pocketcloud.threadpool;
  * @blogger 后起小生
  * @github https://github.com/LeoHalen
  */
-public interface ThreadPoolFactory<E, P> {
+public interface ThreadPoolFactory<E, K, P> {
 
     /**
      * 创建线程池
      * @param p
      * @return
      */
-    E create(P p);
+    E getInstance(K k, P p);
 }
