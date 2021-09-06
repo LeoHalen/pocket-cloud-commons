@@ -23,7 +23,13 @@ public interface DynamicThreadPool {
      */
     ExecutorService getExecutor();
 
+    /**
+     * Refresh config for {@link DynamicThreadPoolExecutor}.
+     */
+    void refreshExecutor();
 
+
+    @Slf4j
     class Factory {
         final static ConcurrentHashMap<String, DynamicThreadPool> dynamicThreadPools = new ConcurrentHashMap<>();
 
@@ -37,6 +43,19 @@ public interface DynamicThreadPool {
             // Cached
             dynamicThreadPools.putIfAbsent(threadPoolName, new DynamicThreadPoolDefault(threadPoolKey, builder));
             return dynamicThreadPools.get(threadPoolName);
+        }
+
+        public static DynamicThreadPool getInstance(DynamicThreadPoolKey threadPoolKey) {
+            String threadPoolName = threadPoolKey.name();
+            DynamicThreadPool previouslyCached = dynamicThreadPools.get(threadPoolName);
+            if (previouslyCached != null) {
+                return previouslyCached;
+            }
+
+            if (log.isDebugEnabled()) {
+                log.debug("Dynamic thread pool key for: {} does not get an 'DynamicThreadPool' instance", threadPoolKey.name());
+            }
+            return null;
         }
     }
 
@@ -63,7 +82,8 @@ public interface DynamicThreadPool {
             return threadPool;
         }
 
-        private void refreshExecutor() {
+        @Override
+        public void refreshExecutor() {
 
             final int dynamicCorePoolSize = properties.getCorePoolSize().get();
              int dynamicMaximumPoolSize = properties.getMaximumPoolSize().get();

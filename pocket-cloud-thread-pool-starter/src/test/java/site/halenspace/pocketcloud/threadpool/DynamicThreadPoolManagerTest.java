@@ -5,6 +5,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import site.halenspace.pocketcloud.threadpool.strategy.properties.DynamicThreadPoolProperties;
 
 import java.beans.PropertyChangeSupport;
+import java.util.concurrent.ExecutorService;
 
 /**
  * @author Halen Leo · 2021/7/6
@@ -13,13 +14,10 @@ import java.beans.PropertyChangeSupport;
 @SpringBootTest(classes = { TestApplication.class, DynamicThreadPoolAutoConfiguration.class})
 public class DynamicThreadPoolManagerTest {
 
-//    @Autowired
-//    private DynamicThreadPoolManager dynamicThreadPoolManager;
-
-    private static final String threadPoolName = "testExecutor";
+    private final DynamicThreadPoolKey threadPoolKey = DynamicThreadPoolKey.Factory.asKey("testExecutor");
 
     @Test
-    public void testCreateDynamicThreadPoolExecutor() {
+    public void mockCreateDynamicThreadPoolExecutor() {
 
 //        DynamicThreadPoolExecutor executor = dynamicThreadPoolManager.getExecutorIfNullCreate(threadPoolName);
 //
@@ -30,25 +28,39 @@ public class DynamicThreadPoolManagerTest {
     }
 
     @Test
-    public void testRefreshDynamicThreadPoolExecutor() {
+    public void mockRefreshDynamicThreadPoolExecutor() {
 
-        DynamicThreadPoolProperties threadPoolProperties = new DynamicThreadPoolProperties();
-//
-//        DynamicThreadPoolExecutor executor = dynamicThreadPoolManager.getExecutorIfNullCreate(threadPoolName);
-//
-//        executor.execute(() -> {
-//            String currentThreadName = Thread.currentThread().getName();
-//            System.out.println("当前线程名：" + currentThreadName);
+//        PropertyChangeSupport changeSupport = new PropertyChangeSupport();
+//        changeSupport.addPropertyChangeListener(evt -> {
+//            System.out.println(evt);
+//            System.out.println("属性变更了");
 //        });
+//
+//        String oldThreadPoolName = threadPoolProperties.getThreadPoolName();
+//        threadPoolProperties.setThreadPoolName("更新线程池名称");
+//        changeSupport.firePropertyChange("threadPoo", oldThreadPoolName, threadPoolProperties.getThreadPoolName());
+    }
 
-        PropertyChangeSupport changeSupport = new PropertyChangeSupport(threadPoolProperties);
-        changeSupport.addPropertyChangeListener(evt -> {
-            System.out.println(evt);
-            System.out.println("属性变更了");
+    @Test
+    public void mockTwoWaysGetThreadPoolExecutorInstanceAreEqual() {
+        ExecutorService executorService = DynamicThreadPoolManager.getInstance().getExecutorOrCreateDefault(threadPoolKey);
+        DynamicThreadPool threadPool = DynamicThreadPoolManager.getInstance().createAndCacheThreadPool(threadPoolKey, DynamicThreadPoolProperties.Setter());
+
+        executorService.execute(() -> {
+            String currentThreadName = Thread.currentThread().getName();
+            System.out.println("Test-1实例 | 当前线程名：" + currentThreadName);
         });
 
-        String oldThreadPoolName = threadPoolProperties.getThreadPoolName();
-        threadPoolProperties.setThreadPoolName("更新线程池名称");
-        changeSupport.firePropertyChange("threadPoo", oldThreadPoolName, threadPoolProperties.getThreadPoolName());
+        threadPool.getExecutor().execute(() -> {
+            String currentThreadName = Thread.currentThread().getName();
+            System.out.println("Test-2实例 | 当前线程名：" + currentThreadName);
+        });
+
+        System.out.println("Test-1实例Hash值: " + executorService.hashCode() + ", Test-2实例Hash值: " + threadPool.getExecutor().hashCode());
+    }
+
+    @Test
+    public void mockThreadPoolExecutorDynamicConfigValidity() {
+
     }
 }

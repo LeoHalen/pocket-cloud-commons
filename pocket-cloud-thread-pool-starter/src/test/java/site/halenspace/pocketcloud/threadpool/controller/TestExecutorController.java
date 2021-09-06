@@ -1,13 +1,15 @@
 package site.halenspace.pocketcloud.threadpool.controller;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
-import site.halenspace.pocketcloud.threadpool.DynamicThreadPoolExecutor;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import site.halenspace.pocketcloud.threadpool.DynamicThreadPoolKey;
 import site.halenspace.pocketcloud.threadpool.DynamicThreadPoolManager;
-import site.halenspace.pocketcloud.threadpool.strategy.properties.ThreadPoolProperties;
 import site.halenspace.pocketcloud.threadpool.request.UpdateThreadPoolReq;
+
+import java.util.concurrent.ExecutorService;
 
 /**
  * @author Halen Leo · 2021/7/6
@@ -17,13 +19,13 @@ import site.halenspace.pocketcloud.threadpool.request.UpdateThreadPoolReq;
 @RequestMapping("/test")
 public class TestExecutorController {
 
-    private static final String threadPoolName = "testExecutor";
+    private final DynamicThreadPoolKey threadPoolKey = DynamicThreadPoolKey.Factory.asKey("test_pool_key");
 
     @GetMapping("executor")
     public void testController() {
-        DynamicThreadPoolExecutor executor = DynamicThreadPoolManager.getInstance().getExecutorIfNullCreate(threadPoolName);
+        ExecutorService executorService = DynamicThreadPoolManager.getInstance().getExecutorOrCreateDefault(threadPoolKey);
 
-        executor.execute(() -> {
+        executorService.execute(() -> {
             String currentThreadName = Thread.currentThread().getName();
             try {
                 Thread.sleep(1000);
@@ -37,13 +39,13 @@ public class TestExecutorController {
     @PostMapping("executor")
     public String updateExecutorConfig(@RequestBody UpdateThreadPoolReq reqParam) {
 
-        if (!DynamicThreadPoolManager.getInstance().contains(reqParam.getThreadPoolName())) {
+        DynamicThreadPoolKey threadPoolKey = DynamicThreadPoolKey.Factory.asKey(reqParam.getThreadPoolName());
+
+        if (!DynamicThreadPoolManager.getInstance().contains(threadPoolKey)) {
             return "不好意思让你失望了，你要找的它不存在！";
         }
 
-        ThreadPoolProperties properties = new ThreadPoolProperties();
-        BeanUtils.copyProperties(reqParam, properties);
-        DynamicThreadPoolManager.getInstance().refreshExecutor(properties);
+        DynamicThreadPoolManager.getInstance().refreshExecutor(threadPoolKey);
 
         return "修改成功";
     }

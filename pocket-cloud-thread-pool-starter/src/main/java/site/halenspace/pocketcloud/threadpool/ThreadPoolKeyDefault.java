@@ -15,7 +15,7 @@ public abstract class ThreadPoolKeyDefault implements ThreadPoolKey {
 
     @Override
     public String name() {
-        return null;
+        return name;
     }
 
     @Override

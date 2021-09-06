@@ -24,45 +24,25 @@ import java.util.concurrent.ExecutorService;
 //@Component
 public class DynamicThreadPoolManager {
 
-    /**
-     * 动态线程池执行器容器
-     *  ConcurrentMap.Entry => {
-     *      key: ThreadPoolName,
-     *      value: DynamicThreadPoolExecutor
-     *  }
-     */
-    private static final ConcurrentMap<String, DynamicThreadPoolExecutor> executorContainer = new ConcurrentHashMap<>();
-    /** 线程池工厂 */
+//    /**
+//     * 动态线程池执行器容器
+//     *  ConcurrentMap.Entry => {
+//     *      key: ThreadPoolName,
+//     *      value: DynamicThreadPoolExecutor
+//     *  }
+//     */
+//    private static final ConcurrentMap<String, DynamicThreadPoolExecutor> executorContainer = new ConcurrentHashMap<>();
+//    /** 线程池工厂 */
 //    private static final ThreadPoolFactory<DynamicThreadPoolExecutor,
 //            DynamicThreadPoolKey, DynamicThreadPoolProperties.Setter> threadPoolFactory = new DynamicThreadPoolFactory();
-    /** 线程池配置参数 */
-    private final List<DynamicThreadPoolProperties> propertiesContainer = new ArrayList<>();
-    /** 实例 */
+//    /** 线程池配置参数 */
+//    private final List<DynamicThreadPoolProperties> propertiesContainer = new ArrayList<>();
+
     private static final DynamicThreadPoolManager INSTANCE = new DynamicThreadPoolManager();
 
 
     private DynamicThreadPoolManager() {
     }
-
-//    public DynamicThreadPoolManager() {
-//    }
-//
-//    public DynamicThreadPoolManager(ThreadPoolProperties properties) {
-//        this.propertiesContainer.add(properties);
-//        this.init();
-//    }
-//
-//    public DynamicThreadPoolManager(List<ThreadPoolProperties> properties) {
-//        this.propertiesContainer.addAll(properties);
-//        this.init();
-//    }
-
-//    @PostConstruct
-//    public void init() {
-//        propertiesContainer.stream()
-//                .filter(p -> !p.isLazyModeEnabled())
-//                .forEach(this::createAndCacheExecutor);
-//    }
 
     public static DynamicThreadPoolManager getInstance() {
         return INSTANCE;
@@ -71,21 +51,29 @@ public class DynamicThreadPoolManager {
     /**
      * 判断线程池是否存在
      *
-     * @param threadPoolName
+     * @param threadPoolKey
      * @return
      */
-    public boolean contains(String threadPoolName) {
-        return executorContainer.containsKey(threadPoolName);
+    public boolean contains(DynamicThreadPoolKey threadPoolKey) {
+        DynamicThreadPool dynamicThreadPool = DynamicThreadPool.Factory.getInstance(threadPoolKey);
+        if (dynamicThreadPool == null) {
+            return Boolean.FALSE;
+        }
+        return Boolean.TRUE;
     }
 
     /**
      * 通过名称获取线程池执行器
      *
-     * @param threadPoolName
+     * @param threadPoolKey
      * @return
      */
-    public DynamicThreadPoolExecutor getExecutor(String threadPoolName) {
-        return executorContainer.get(threadPoolName);
+    public ExecutorService getExecutor(DynamicThreadPoolKey threadPoolKey) {
+        DynamicThreadPool dynamicThreadPool = DynamicThreadPool.Factory.getInstance(threadPoolKey);
+        if (dynamicThreadPool == null) {
+            return null;
+        }
+        return dynamicThreadPool.getExecutor();
     }
 
     /**
@@ -94,54 +82,47 @@ public class DynamicThreadPoolManager {
      * @param threadPoolKey
      * @return
      */
-    public DynamicThreadPoolExecutor getExecutorIfNullCreate(DynamicThreadPoolKey threadPoolKey) {
-        DynamicThreadPoolExecutor threadPoolExecutor = executorContainer.get(threadPoolKey.name());
-        if (threadPoolExecutor != null) {
-            return threadPoolExecutor;
-        }
-        return createAndCacheExecutor(threadPoolKey, DynamicThreadPoolProperties.Setter());
-    }
-
-    private boolean existed(DynamicThreadPoolKey threadPoolKey) {
-        return executorContainer.containsKey(threadPoolKey.name());
+    public ExecutorService getExecutorOrCreateDefault(DynamicThreadPoolKey threadPoolKey) {
+        DynamicThreadPool dynamicThreadPool = DynamicThreadPool.Factory.getInstance(threadPoolKey, DynamicThreadPoolProperties.Setter());
+        return dynamicThreadPool.getExecutor();
     }
 
     /**
      * 创建并缓存线程池执行器
      *
      * @throws ExecutorCreateFailureException
-     *          If the thread pool name is duplicated.
+     *          If the {@link DynamicThreadPoolKey} is duplicated.
      */
-    private synchronized ExecutorService createAndCacheExecutor(DynamicThreadPoolKey threadPoolKey, DynamicThreadPoolProperties.Setter builder) {
-//        if (threadPoolExisted(threadPoolKey)) {
-//            throw new ExecutorCreateFailureException("The thread pool name '" + threadPoolKey.name() + "' already exists.");
-//        }
-//        final DynamicThreadPoolProperties properties = DynamicThreadPoolPropertiesFactory.getThreadPoolProperties(threadPoolKey, builder);
-//        DynamicThreadPoolExecutor dynamicThreadPoolExecutor = DynamicThreadPoolFactory.getInstance().getThreadPool(threadPoolKey, properties);
-//        executorContainer.putIfAbsent(threadPoolKey.name(), dynamicThreadPoolExecutor);
-
-        DynamicThreadPool dynamicThreadPool = DynamicThreadPool.Factory.getInstance(threadPoolKey, builder);
-        return dynamicThreadPool.getExecutor();
+    public DynamicThreadPool createAndCacheThreadPool(DynamicThreadPoolKey threadPoolKey, DynamicThreadPoolProperties.Setter builder) {
+        return DynamicThreadPool.Factory.getInstance(threadPoolKey, builder);
     }
+
 
     /**
-     * 刷新线程池执行器参数
+     * 刷新线程池执行器 {@link DynamicThreadPoolExecutor}.
      *
+     * @param threadPoolKey
      * @throws ExecutorRefreshFailureException
-     *          If the thread pool name does not exist.
+     *          If the {@link DynamicThreadPoolKey} not existed.
      */
-    public synchronized void refreshExecutor(DynamicThreadPoolKey threadPoolKey, DynamicThreadPoolProperties.Setter builder) throws ExecutorRefreshFailureException {
-        if (!threadPoolExisted(threadPoolKey)) {
-            throw new ExecutorRefreshFailureException("The thread pool name '" + threadPoolKey.name() + "' doesn't exist.");
+    public void refreshExecutor(DynamicThreadPoolKey threadPoolKey) throws ExecutorRefreshFailureException {
+        DynamicThreadPool dynamicThreadPool = DynamicThreadPool.Factory.getInstance(threadPoolKey);
+        if (dynamicThreadPool == null) {
+            throw new ExecutorRefreshFailureException("The thread pool '" + threadPoolKey.name() + "' doesn't existed.");
         }
-        DynamicThreadPoolExecutor threadPoolExecutor = executorContainer.get(threadPoolKey.name());
-        doRefresh(threadPoolExecutor, properties);
+        dynamicThreadPool.refreshExecutor();
     }
 
-    private void doRefresh(DynamicThreadPoolExecutor executor, DynamicThreadPoolProperties properties) {
-        executor.setCorePoolSize(properties.getCorePoolSize().get());
-        executor.setMaximumPoolSize(properties.getMaximumPoolSize().get());
-        executor.setKeepAliveTime(properties.getKeepAliveTime().get(), properties.getDefaultTimeUnit());
-        executor.setRejectedExecutionHandler(RejectedExecutionBuilder.build(properties.getRejectedExecutionType().get()));
-    }
+//    /**
+//     * 刷新线程池执行器参数
+//     *
+//     * @throws ExecutorRefreshFailureException
+//     *          If the thread pool name does not exist.
+//     */
+//    public synchronized void refreshExecutor(DynamicThreadPoolKey threadPoolKey, DynamicThreadPoolProperties.Setter builder) throws ExecutorRefreshFailureException {
+//        if (!threadPoolExisted(threadPoolKey)) {
+//            throw new ExecutorRefreshFailureException("The thread pool name '" + threadPoolKey.name() + "' doesn't exist.");
+//        }
+//        DynamicThreadPoolExecutor threadPoolExecutor = executorContainer.get(threadPoolKey.name());
+//    }
 }
