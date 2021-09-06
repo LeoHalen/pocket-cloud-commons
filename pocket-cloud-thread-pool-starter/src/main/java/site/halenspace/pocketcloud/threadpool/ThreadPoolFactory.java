@@ -14,5 +14,5 @@ public interface ThreadPoolFactory<E, K, P> {
      * @param p
      * @return
      */
-    E getInstance(K k, P p);
+    E getThreadPool(K k, P p);
 }

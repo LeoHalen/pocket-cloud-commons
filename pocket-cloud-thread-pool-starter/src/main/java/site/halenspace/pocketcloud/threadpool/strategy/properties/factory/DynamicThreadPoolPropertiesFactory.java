@@ -27,27 +27,24 @@ public class DynamicThreadPoolPropertiesFactory {
     public static DynamicThreadPoolProperties getThreadPoolProperties(DynamicThreadPoolKey key, DynamicThreadPoolProperties.Setter builder) {
         ThreadPoolPropertiesStrategy threadPoolPropertiesStrategy = ThreadPoolPlugins.getInstance().getPropertiesStrategy();
         String cacheKey = threadPoolPropertiesStrategy.getThreadPoolPropertiesCacheKey(key, builder);
-        if (cacheKey != null) {
-            DynamicThreadPoolProperties properties = threadPoolPropertiesMap.get(cacheKey);
-            if (properties != null) {
-                return properties;
-            } else {
-                if (builder == null) {
-                    builder = DynamicThreadPoolProperties.Setter();
-                }
-                // create new instance
-                properties = threadPoolPropertiesStrategy.getThreadPoolProperties(key, builder);
-                // cache and return
-                DynamicThreadPoolProperties existing = threadPoolPropertiesMap.putIfAbsent(cacheKey, properties);
-                if (existing == null) {
-                    return properties;
-                } else {
-                    return existing;
-                }
-            }
-        } else {
+        if (cacheKey == null) {
             // no cacheKey so we generate it with caching
             return threadPoolPropertiesStrategy.getThreadPoolProperties(key, builder);
         }
+        DynamicThreadPoolProperties properties = threadPoolPropertiesMap.get(cacheKey);
+        if (properties != null) {
+            return properties;
+        }
+        if (builder == null) {
+            builder = DynamicThreadPoolProperties.Setter();
+        }
+        // create new instance
+        properties = threadPoolPropertiesStrategy.getThreadPoolProperties(key, builder);
+        // cache and return
+        DynamicThreadPoolProperties existing = threadPoolPropertiesMap.putIfAbsent(cacheKey, properties);
+        if (existing == null) {
+            return properties;
+        }
+        return existing;
     }
 }

@@ -9,16 +9,16 @@ public abstract class ThreadPoolPropertiesStrategy {
 
 
     /**
-     * Construct an implementation of {@link DynamicThreadPoolProperties} for {@link HystrixThreadPool} instances with {@link DynamicThreadPoolKey}.
+     * Construct an implementation of {@link DynamicThreadPoolProperties} for {@link site.halenspace.pocketcloud.threadpool.DynamicThreadPool} instances with {@link DynamicThreadPoolKey}.
      * <p>
      * <b>Default Implementation</b>
      * <p>
      * Constructs instance of {@link DynamicThreadPoolPropertiesDefault}.
      *
      * @param threadPoolKey
-     *            {@link DynamicThreadPoolKey} representing the name or type of {@link HystrixThreadPool}
+     *            {@link DynamicThreadPoolKey} representing the name or type of {@link site.halenspace.pocketcloud.threadpool.DynamicThreadPool}
      * @param builder
-     *            {@link DynamicThreadPoolProperties.Setter} with default overrides as injected via {@link HystrixCommand} to the {@link HystrixThreadPool} implementation.
+     *            {@link DynamicThreadPoolProperties.Setter} with default overrides as injected via {@link } to the {@link site.halenspace.pocketcloud.threadpool.DynamicThreadPool} implementation.
      *            <p>
      *            The builder will return NULL for each value if no override was provided.
      *
@@ -33,7 +33,7 @@ public abstract class ThreadPoolPropertiesStrategy {
      * <p>
      * Typically this would return <code>DynamicThreadPoolKey.name()</code> but can be done differently if required.
      * <p>
-     * For example, null can be returned which would cause it to not cache and invoke {@link #getThreadPoolProperties} for each {@link HystrixThreadPool} instantiation (not recommended).
+     * For example, null can be returned which would cause it to not cache and invoke {@link #getThreadPoolProperties} for each {@link site.halenspace.pocketcloud.threadpool.DynamicThreadPool} instantiation (not recommended).
      * <p>
      * <b>Default Implementation</b>
      * <p>
