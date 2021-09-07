@@ -1,10 +1,5 @@
 package site.halenspace.pocketcloud.threadpool;
 
-import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 import site.halenspace.pocketcloud.threadpool.strategy.properties.ThreadPoolDynamicProperties;
 import site.halenspace.pocketcloud.threadpool.strategy.properties.property.ThreadPoolDynamicProperty;
