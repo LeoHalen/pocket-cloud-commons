@@ -17,3 +17,9 @@ pocket:
     fair: true
     rejectedExecutionType: AbortPolicy
     lazyModeEnabled: true
+
+dynamic:
+  threadpool:
+    test-executor:
+      corePoolSize: 2
+      maximumPoolSize: 4

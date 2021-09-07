@@ -114,7 +114,7 @@ public class ThreadPoolPlugins {
     private static <T> T getPluginImplementationViaProperties(Class<T> pluginClass, ThreadPoolDynamicProperties dynamicProperties) {
         String classSimpleName = pluginClass.getSimpleName();
         // Check Archaius for plugin class.
-        String propertyName = "dynamic.thread.pool.plugin." + classSimpleName + ".implementation";
+        String propertyName = "thread.pool.plugin." + classSimpleName + ".implementation";
         String implementingClass = dynamicProperties.getString(propertyName, null).get();
         if (implementingClass != null) {
             try {
@@ -148,10 +148,10 @@ public class ThreadPoolPlugins {
             return hp;
         }
         // archaius方式
-//        hp = ThreadPoolArchaiusHelper.createArchaiusDynamicProperties();
-//        if (hp != null) {
-//            return hp;
-//        }
+        hp = ThreadPoolArchaiusHelper.createArchaiusDynamicProperties();
+        if (hp != null) {
+            return hp;
+        }
         // 系统配置属性动态加载方式托底
         hp = ThreadPoolDynamicPropertiesSystemProperties.getInstance();
         return hp;

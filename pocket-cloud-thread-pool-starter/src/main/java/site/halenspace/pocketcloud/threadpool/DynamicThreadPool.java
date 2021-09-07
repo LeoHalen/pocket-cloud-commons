@@ -86,7 +86,7 @@ public interface DynamicThreadPool {
         public void refreshExecutor() {
 
             final int dynamicCorePoolSize = properties.getCorePoolSize().get();
-             int dynamicMaximumPoolSize = properties.getMaximumPoolSize().get();
+            int dynamicMaximumPoolSize = properties.getMaximumPoolSize().get();
             final long dynamicKeepAliveTime = properties.getKeepAliveTime().get();
             final int dynamicMaxQueueSize = properties.getMaxQueueSize().get();
             final boolean dynamicFair = properties.getFair().get();
@@ -102,7 +102,7 @@ public interface DynamicThreadPool {
             if (threadPool.getCorePoolSize() != dynamicCorePoolSize || threadPool.getMaximumPoolSize() != dynamicMaximumPoolSize) {
                 if (maxTooLow) {
                     log.error("Dynamic thread pool configuration at refresh executor for: " +
-                                    "{} is trying to set coreSize = {} and maximumSize = {}. Maximum size will be set to {}, " +
+                                    "{} is trying to set coreSize = {} and maximumSize = {}. MaximumSize will be set to {}, " +
                                     "the coreSize value, since it must be equal to or greater than the coreSize value",
                             threadPoolKey.name(), dynamicCorePoolSize, dynamicMaximumPoolSize, dynamicCorePoolSize);
                 }

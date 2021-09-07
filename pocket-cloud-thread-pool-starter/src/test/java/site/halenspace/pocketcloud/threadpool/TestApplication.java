@@ -2,13 +2,13 @@ package site.halenspace.pocketcloud.threadpool;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.Import;
+import org.springframework.context.annotation.PropertySource;
 
 /**
  * @author Halen Leo · 2021/7/6
  */
 @SpringBootApplication
-@Import(DynamicThreadPoolAutoConfiguration.class)
+//@Import(DynamicThreadPoolAutoConfiguration.class)
 public class TestApplication {
 
     public static void main(String[] args) {

@@ -112,15 +112,14 @@ public class ThreadPoolPropertiesChainedProperty {
             ChainProperty<T> current = null;
             for (ThreadPoolDynamicProperty<T> p : reversed) {
                 if (current == null) {
-                    current = new ChainProperty<T>(p);
+                    current = new ChainProperty<>(p);
                 }
                 else {
-                    current = new ChainProperty<T>(p, current);
+                    current = new ChainProperty<>(p, current);
                 }
             }
 
-            return new ChainHystrixProperty<T>(current);
-
+            return new ChainThreadPoolProperty<>(current);
         }
 
         protected abstract Class<T> getType();
@@ -149,10 +148,10 @@ public class ThreadPoolPropertiesChainedProperty {
         return forType(Long.class);
     }
 
-    private static class ChainHystrixProperty<T> implements ThreadPoolDynamicProperty<T> {
+    private static class ChainThreadPoolProperty<T> implements ThreadPoolDynamicProperty<T> {
         private final ChainProperty<T> property;
 
-        public ChainHystrixProperty(ChainProperty<T> property) {
+        public ChainThreadPoolProperty(ChainProperty<T> property) {
             super();
             this.property = property;
         }
@@ -188,12 +187,9 @@ public class ThreadPoolPropertiesChainedProperty {
             super(next); // setup next pointer
 
             sProp = sProperty;
-            sProp.addCallback(new Runnable() {
-                @Override
-                public void run() {
-                    log.debug("Property changed: '{} = {}'", getName(), getValue());
-                    checkAndFlip();
-                }
+            sProp.addCallback(() -> {
+                log.debug("Property changed: '{} = {}'", getName(), getValue());
+                checkAndFlip();
             });
             checkAndFlip();
         }

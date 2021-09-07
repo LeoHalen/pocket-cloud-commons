@@ -12,7 +12,7 @@ import java.util.concurrent.ExecutorService;
  */
 //@RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest(classes = { TestApplication.class, DynamicThreadPoolAutoConfiguration.class})
-public class DynamicThreadPoolManagerTest {
+public class DynamicThreadPoolManagerMock {
 
     private final DynamicThreadPoolKey threadPoolKey = DynamicThreadPoolKey.Factory.asKey("testExecutor");
 
@@ -60,7 +60,32 @@ public class DynamicThreadPoolManagerTest {
     }
 
     @Test
-    public void mockThreadPoolExecutorDynamicConfigValidity() {
-
+    public void mockThreadPoolExecutorDynamicConfigValidity() throws InterruptedException {
+        System.setProperty("dynamic.threadpool.testExecutor.keepAliveTime", "10");
+        System.setProperty("dynamic.threadpool.testExecutor.corePoolSize", "2");
+        ExecutorService executorService = DynamicThreadPoolManager.getInstance().getExecutorOrCreateDefault(threadPoolKey);
+        System.setProperty("dynamic.threadpool.testExecutor.corePoolSize", "1");
+        int i = 10;
+        while (i-- > 1) {
+//            if (i == 90) {
+//                DynamicThreadPoolManager.getInstance().refreshExecutor(threadPoolKey);
+//            }
+            Thread.sleep(1000);
+            executorService.execute(() -> {
+                String currentThreadName = Thread.currentThread().getName();
+                System.out.println(threadPoolKey + "线程池实例 | 当前线程名：" + currentThreadName);
+            });
+        }
+        DynamicThreadPoolManager.getInstance().refreshExecutor(threadPoolKey);
+        System.out.println("刷新线程池");
+        i = 20;
+        while (i-- > 1) {
+            Thread.sleep(1000);
+            executorService.execute(() -> {
+                String currentThreadName = Thread.currentThread().getName();
+                System.out.println(threadPoolKey + "线程池实例 | 当前线程名：" + currentThreadName + " => 是否被中断：" + Thread.currentThread().isInterrupted());
+            });
+        }
+        System.out.println("corePoolSize: " + System.getProperty("dynamic.threadpool.testExecutor.corePoolSize"));
     }
 }
