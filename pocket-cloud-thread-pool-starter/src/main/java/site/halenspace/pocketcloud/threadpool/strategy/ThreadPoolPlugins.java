@@ -1,10 +1,15 @@
 package site.halenspace.pocketcloud.threadpool.strategy;
 
+import org.springframework.context.ApplicationContext;
+import org.springframework.core.env.Environment;
 import site.halenspace.pocketcloud.threadpool.strategy.properties.ThreadPoolDynamicProperties;
 import site.halenspace.pocketcloud.threadpool.strategy.properties.ThreadPoolDynamicPropertiesSystemProperties;
 import site.halenspace.pocketcloud.threadpool.strategy.properties.ThreadPoolPropertiesStrategy;
 import site.halenspace.pocketcloud.threadpool.strategy.properties.ThreadPoolPropertiesStrategyDefault;
+import site.halenspace.pocketcloud.threadpool.util.SpringContextUtil;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ServiceConfigurationError;
 import java.util.ServiceLoader;
 import java.util.concurrent.atomic.AtomicReference;
@@ -140,6 +145,13 @@ public class ThreadPoolPlugins {
         ThreadPoolDynamicProperties hp = getPluginImplementationViaProperties(
                 ThreadPoolDynamicProperties.class, ThreadPoolDynamicPropertiesSystemProperties.getInstance());
         if (hp != null) {
+            Environment environment = SpringContextUtil.applicationContext.getEnvironment();
+            try {
+                Method setEnvironment = hp.getClass().getDeclaredMethod("setEnvironment", Environment.class);
+                setEnvironment.invoke(hp, environment);
+            } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+                e.printStackTrace();
+            }
             return hp;
         }
         // 外部自定义扩展的方式

@@ -1,6 +1,9 @@
 package site.halenspace.pocketcloud.threadpool;
 
+import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 import site.halenspace.pocketcloud.threadpool.strategy.properties.ThreadPoolDynamicProperties;
@@ -11,12 +14,14 @@ import site.halenspace.pocketcloud.threadpool.strategy.properties.property.Threa
  */
 public class ThreadPoolPluginsMock {
 
-    @Configuration
+
     public static class ThreadPoolDynamicPropertiesMockSpringBoot implements ThreadPoolDynamicProperties {
 
-        @Autowired
         private Environment env;
 
+        public void setEnvironment(Environment env) {
+            this.env = env;
+        }
 
         @Override
         public ThreadPoolDynamicProperty<String> getString(String name, String fallback) {
