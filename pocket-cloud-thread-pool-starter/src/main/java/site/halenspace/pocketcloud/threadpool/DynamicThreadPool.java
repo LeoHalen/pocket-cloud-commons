@@ -34,14 +34,18 @@ public interface DynamicThreadPool {
         final static ConcurrentHashMap<String, DynamicThreadPool> dynamicThreadPools = new ConcurrentHashMap<>();
 
         public static DynamicThreadPool getInstance(DynamicThreadPoolKey threadPoolKey, DynamicThreadPoolProperties.Setter builder) {
+            return getInstance(threadPoolKey, builder, null);
+        }
+
+        public static DynamicThreadPool getInstance(
+                DynamicThreadPoolKey threadPoolKey, DynamicThreadPoolProperties.Setter builder, ExecutorListener listener) {
             String threadPoolName = threadPoolKey.name();
             DynamicThreadPool previouslyCached = dynamicThreadPools.get(threadPoolName);
             if (previouslyCached != null) {
                 return previouslyCached;
             }
-
             // Cached
-            dynamicThreadPools.putIfAbsent(threadPoolName, new DynamicThreadPoolDefault(threadPoolKey, builder));
+            dynamicThreadPools.putIfAbsent(threadPoolName, new DynamicThreadPoolDefault(threadPoolKey, builder, listener));
             return dynamicThreadPools.get(threadPoolName);
         }
 
@@ -73,6 +77,14 @@ public interface DynamicThreadPool {
             this.properties = DynamicThreadPoolPropertiesFactory.getThreadPoolProperties(threadPoolKey, builder);
             this.threadPool = DynamicThreadPoolFactory.getInstance().getThreadPool(threadPoolKey, this.properties);
             this.workingQueue = this.threadPool.getQueue();
+            this.queueSize = this.properties.getMaxQueueSize().get();
+        }
+        public DynamicThreadPoolDefault(DynamicThreadPoolKey threadPoolKey, DynamicThreadPoolProperties.Setter builder, ExecutorListener listener) {
+            this.threadPoolKey = threadPoolKey;
+            this.properties = DynamicThreadPoolPropertiesFactory.getThreadPoolProperties(threadPoolKey, builder);
+            this.threadPool = DynamicThreadPoolFactory.getInstance().getThreadPool(threadPoolKey, this.properties);
+            this.workingQueue = this.threadPool.getQueue();
+            this.threadPool.addListener(listener);
             this.queueSize = this.properties.getMaxQueueSize().get();
         }
 

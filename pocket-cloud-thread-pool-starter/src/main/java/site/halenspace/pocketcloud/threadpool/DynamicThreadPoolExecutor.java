@@ -12,6 +12,8 @@ import java.util.concurrent.*;
  */
 public class DynamicThreadPoolExecutor extends ThreadPoolExecutor {
 
+    private ExecutorListener listener;
+
     public DynamicThreadPoolExecutor(int corePoolSize, int maximumPoolSize, long keepAliveTime, TimeUnit unit,
                                      BlockingQueue<Runnable> workQueue) {
         super(corePoolSize, maximumPoolSize, keepAliveTime, unit, workQueue);
@@ -30,6 +32,35 @@ public class DynamicThreadPoolExecutor extends ThreadPoolExecutor {
     public DynamicThreadPoolExecutor(int corePoolSize, int maximumPoolSize, long keepAliveTime, TimeUnit unit,
                                      BlockingQueue<Runnable> workQueue, ThreadFactory threadFactory, RejectedExecutionHandler handler) {
         super(corePoolSize, maximumPoolSize, keepAliveTime, unit, workQueue, threadFactory, handler);
+    }
+
+    @Override
+    protected void beforeExecute(Thread t, Runnable r) {
+        if (listener != null) {
+            listener.beforeExecute(t, r);
+        }
+    }
+
+    @Override
+    protected void afterExecute(Runnable r, Throwable t) {
+        if (t != null) {
+            listener.throwableExecute(r, t);
+            return;
+        }
+        listener.afterExecute(r);
+    }
+
+    @Override
+    protected void terminated() {
+        super.terminated();
+    }
+
+    protected void addListener(ExecutorListener listener) {
+        this.listener = listener;
+    }
+
+    protected void removeListener() {
+        this.listener = null;
     }
 
     public static class DynamicDiscardPolicy implements RejectedExecutionHandler {
@@ -56,4 +87,7 @@ public class DynamicThreadPoolExecutor extends ThreadPoolExecutor {
             throw new RejectedExecutionException("Task " + r.toString() + " rejected from " + e.toString());
         }
     }
+
+
+
 }
