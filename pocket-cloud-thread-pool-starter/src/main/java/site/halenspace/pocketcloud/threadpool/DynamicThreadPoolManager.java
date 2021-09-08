@@ -86,9 +86,6 @@ public class DynamicThreadPoolManager {
     }
 
     /**
-     * 创建并缓存线程池执行器
-     */
-    /**
      * Create and cache {@link DynamicThreadPool}
      *
      * @param threadPoolKey

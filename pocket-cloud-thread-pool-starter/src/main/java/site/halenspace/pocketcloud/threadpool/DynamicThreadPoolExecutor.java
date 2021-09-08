@@ -1,6 +1,8 @@
 package site.halenspace.pocketcloud.threadpool;
 
 
+import lombok.extern.slf4j.Slf4j;
+
 import java.util.concurrent.*;
 
 /**
@@ -10,6 +12,7 @@ import java.util.concurrent.*;
  * @Blogger 后起小生
  * @Github https://github.com/LeoHalen
  */
+@Slf4j
 public class DynamicThreadPoolExecutor extends ThreadPoolExecutor {
 
     private ExecutorListener listener;
