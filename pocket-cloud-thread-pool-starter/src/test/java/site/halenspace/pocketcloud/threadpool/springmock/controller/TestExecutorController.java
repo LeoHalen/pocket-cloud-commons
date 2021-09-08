@@ -1,10 +1,10 @@
-package site.halenspace.pocketcloud.threadpool.controller;
+package site.halenspace.pocketcloud.threadpool.springmock.controller;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import site.halenspace.pocketcloud.threadpool.DynamicThreadPoolKey;
 import site.halenspace.pocketcloud.threadpool.DynamicThreadPoolManager;
-import site.halenspace.pocketcloud.threadpool.request.UpdateThreadPoolReq;
+import site.halenspace.pocketcloud.threadpool.springmock.request.UpdateThreadPoolReq;
 
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
@@ -74,7 +74,7 @@ public class TestExecutorController {
     public void testRefreshConfigIsValid() {
         Map<String, String> getenv = System.getenv();
         System.setProperty("thread.pool.plugin.ThreadPoolDynamicProperties.implementation",
-                "site.halenspace.pocketcloud.threadpool.ThreadPoolPluginsMock$ThreadPoolDynamicPropertiesMockSpringBoot");
+                "site.halenspace.pocketcloud.threadpool.javamock.ThreadPoolPluginsMock$ThreadPoolDynamicPropertiesMockSpringBoot");
         System.out.println("corePoolSize: " + System.getProperty("dynamic.threadpool.test-executor.corePoolSize"));
         System.out.println("maximumPoolSize: " + System.getProperty("dynamic.threadpool.test-executor.maximumPoolSize"));
         DynamicThreadPoolKey threadPoolKey = DynamicThreadPoolKey.Factory.asKey("test-executor");

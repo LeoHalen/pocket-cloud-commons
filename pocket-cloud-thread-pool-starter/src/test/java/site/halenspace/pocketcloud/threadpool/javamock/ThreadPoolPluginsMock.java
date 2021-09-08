@@ -1,4 +1,4 @@
-package site.halenspace.pocketcloud.threadpool;
+package site.halenspace.pocketcloud.threadpool.javamock;
 
 import org.springframework.core.env.Environment;
 import site.halenspace.pocketcloud.threadpool.strategy.properties.ThreadPoolDynamicProperties;

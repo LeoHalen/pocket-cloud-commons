@@ -1,10 +1,10 @@
-package site.halenspace.pocketcloud.threadpool;
+package site.halenspace.pocketcloud.threadpool.springmock;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+import site.halenspace.pocketcloud.threadpool.*;
 import site.halenspace.pocketcloud.threadpool.strategy.properties.DynamicThreadPoolProperties;
 
-import java.beans.PropertyChangeSupport;
 import java.util.concurrent.ExecutorService;
 
 /**
@@ -12,7 +12,7 @@ import java.util.concurrent.ExecutorService;
  */
 //@RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest(classes = { TestApplication.class, DynamicThreadPoolAutoConfiguration.class})
-public class DynamicThreadPoolManagerMock {
+public class DynamicThreadPoolManageSpringBootMock {
 
     private final DynamicThreadPoolKey threadPoolKey = DynamicThreadPoolKey.Factory.asKey("testExecutor");
 

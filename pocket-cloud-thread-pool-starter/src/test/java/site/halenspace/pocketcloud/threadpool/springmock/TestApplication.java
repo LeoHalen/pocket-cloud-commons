@@ -1,8 +1,7 @@
-package site.halenspace.pocketcloud.threadpool;
+package site.halenspace.pocketcloud.threadpool.springmock;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.PropertySource;
 
 /**
  * @author Halen Leo · 2021/7/6

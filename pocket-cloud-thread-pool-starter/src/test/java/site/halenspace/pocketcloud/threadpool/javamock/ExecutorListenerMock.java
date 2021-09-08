@@ -1,0 +1,164 @@
+package site.halenspace.pocketcloud.threadpool.javamock;
+
+import site.halenspace.pocketcloud.threadpool.DynamicThreadPoolKey;
+import site.halenspace.pocketcloud.threadpool.DynamicThreadPoolManager;
+import site.halenspace.pocketcloud.threadpool.ExecutorListener;
+
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
+import java.util.concurrent.FutureTask;
+
+/**
+ * @author Halen.Leo · 2021/9/8
+ */
+public class ExecutorListenerMock {
+
+    public static void main(String[] args) throws InterruptedException, ExecutionException {
+//        mockNotAllThreadsAfterExecute();
+//        mockNoneOfTheThreadsAfterExecute();
+//        mockAllThreadsAfterExecuteSuccess();
+//        mockNoneOfTheThreadsThrowableExecute();
+//        mockTheThreadsThrowableExecuteSuccess();
+//        mockSubmitHandlerThrowableExecuteSuccess();
+    }
+
+    /**
+     * mock使用过程中需要的注意事项 -> 重写Listener的afterExecute, 但是并没有所有线程执行完毕都回调此方法
+     */
+    public static void mockNotAllThreadsAfterExecute() {
+        DynamicThreadPoolKey threadPoolKey = DynamicThreadPoolKey.Factory.asKey("testExecutor");
+        ExecutorService executorService = DynamicThreadPoolManager.getInstance().getExecutorOrCreateDefault(threadPoolKey);
+        MockExecutorListener listener = new MockExecutorListener();
+        DynamicThreadPoolManager.getInstance().addExecutorListener(threadPoolKey, listener);
+
+        int i = 10;
+        while (i-- > 0) {
+            executorService.execute(() -> {
+                System.out.println(threadPoolKey + "线程池实例 | 当前线程名: " + Thread.currentThread().getName());
+            });
+        }
+    }
+
+    /**
+     * mock使用过程中需要的注意事项 -> 重写Listener的afterExecute, 所有线程完毕都没有回调此方法
+     */
+    public static void mockNoneOfTheThreadsAfterExecute() {
+        DynamicThreadPoolKey threadPoolKey = DynamicThreadPoolKey.Factory.asKey("testExecutor");
+        ExecutorService executorService = DynamicThreadPoolManager.getInstance().getExecutorOrCreateDefault(threadPoolKey);
+        MockExecutorListener listener = new MockExecutorListener();
+        DynamicThreadPoolManager.getInstance().addExecutorListener(threadPoolKey, listener);
+
+        int i = 10;
+        while (i-- > 0) {
+            executorService.execute(() -> {
+                System.out.println(threadPoolKey + "线程池实例 | 当前线程名: " + Thread.currentThread().getName());
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            });
+        }
+    }
+
+    /**
+     * mock使用过程中需要的注意事项 -> 重写Listener的afterExecute, 所有线程均成功执行回调此方法
+     */
+    public static void mockAllThreadsAfterExecuteSuccess() throws InterruptedException {
+        DynamicThreadPoolKey threadPoolKey = DynamicThreadPoolKey.Factory.asKey("testExecutor");
+        ExecutorService executorService = DynamicThreadPoolManager.getInstance().getExecutorOrCreateDefault(threadPoolKey);
+        MockExecutorListener listener = new MockExecutorListener();
+        DynamicThreadPoolManager.getInstance().addExecutorListener(threadPoolKey, listener);
+
+        int i = 10;
+        while (i-- > 0) {
+            executorService.execute(() -> {
+                System.out.println(threadPoolKey + "线程池实例 | 当前线程名: " + Thread.currentThread().getName());
+            });
+        }
+        Thread.sleep(2000);
+    }
+
+    /**
+     * mock使用过程中需要的注意事项 -> 重写Listener的throwableExecute, 线程只回调了此方法但并未抛出异常
+     *  note: ExecutorService.submit方法底层将异常捕获并存放到 {@link FutureTask} 中返回
+     */
+    public static void mockNoneOfTheThreadsThrowableExecute() throws InterruptedException {
+        DynamicThreadPoolKey threadPoolKey = DynamicThreadPoolKey.Factory.asKey("testExecutor");
+        ExecutorService executorService = DynamicThreadPoolManager.getInstance().getExecutorOrCreateDefault(threadPoolKey);
+        MockExecutorListener listener = new MockExecutorListener();
+        DynamicThreadPoolManager.getInstance().addExecutorListener(threadPoolKey, listener);
+
+        int i = 10;
+        while (i-- > 0) {
+            executorService.submit(() -> {
+                System.out.println(threadPoolKey + "线程池实例 | 当前线程名: " + Thread.currentThread().getName());
+                int c = 10 / 0;
+            });
+        }
+        Thread.sleep(2000);
+    }
+
+    /**
+     * mock使用过程中需要的注意事项 -> 重写Listener的throwableExecute, 线程成功回调此方法并且也抛出了异常
+     *  note: ExecutorService.execute方法底层并没有吞掉异常
+     */
+    public static void mockExecuteHandlerThrowableExecuteSuccess() throws InterruptedException {
+        DynamicThreadPoolKey threadPoolKey = DynamicThreadPoolKey.Factory.asKey("testExecutor");
+        ExecutorService executorService = DynamicThreadPoolManager.getInstance().getExecutorOrCreateDefault(threadPoolKey);
+        MockExecutorListener listener = new MockExecutorListener();
+        DynamicThreadPoolManager.getInstance().addExecutorListener(threadPoolKey, listener);
+
+        int i = 10;
+        while (i-- > 0) {
+            executorService.execute(() -> {
+                System.out.println(threadPoolKey + "线程池实例 | 当前线程名: " + Thread.currentThread().getName());
+                int c = 10 / 0;
+            });
+        }
+        Thread.sleep(2000);
+    }
+
+    /**
+     * mock使用过程中需要的注意事项 -> 重写Listener的throwableExecute, 线程成功回调此方法并且也获取到了异常
+     *  note: ExecutorService.submit方法底层将异常捕获并存放到 {@link FutureTask} 中返回
+     */
+    public static void mockSubmitHandlerThrowableExecuteSuccess() throws InterruptedException, ExecutionException {
+        DynamicThreadPoolKey threadPoolKey = DynamicThreadPoolKey.Factory.asKey("testExecutor");
+        ExecutorService executorService = DynamicThreadPoolManager.getInstance().getExecutorOrCreateDefault(threadPoolKey);
+        MockExecutorListener listener = new MockExecutorListener();
+        DynamicThreadPoolManager.getInstance().addExecutorListener(threadPoolKey, listener);
+
+        int i = 10;
+        while (i-- > 0) {
+            Future<?> resultFuture = executorService.submit(() -> {
+                System.out.println(threadPoolKey + "线程池实例 | 当前线程名: " + Thread.currentThread().getName());
+                int c = 10 / 0;
+            });
+            resultFuture.get();
+        }
+        Thread.sleep(2000);
+    }
+
+    /**
+     * Mock interface {@link ExecutorListener} implements
+     */
+    public static class MockExecutorListener implements ExecutorListener {
+
+        @Override
+        public void beforeExecute(Thread t, Runnable r) {
+            System.out.println("线程执行前 | 当前线程名: " + t.getName() + "Runnable: " +r.toString());
+        }
+
+        @Override
+        public void afterExecute(Runnable r) {
+            System.out.println("线程执行后 | Runnable: " + r.toString());
+        }
+
+        @Override
+        public void throwableExecute(Runnable r, Throwable t) {
+            System.out.println("线程执行后 | Runnable: " + r.toString() + "异常: " + t.toString());
+        }
+    }
+}

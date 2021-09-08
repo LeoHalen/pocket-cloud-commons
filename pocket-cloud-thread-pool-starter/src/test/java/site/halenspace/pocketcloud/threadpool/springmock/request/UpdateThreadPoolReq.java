@@ -1,4 +1,4 @@
-package site.halenspace.pocketcloud.threadpool.request;
+package site.halenspace.pocketcloud.threadpool.springmock.request;
 
 import lombok.Data;
 import site.halenspace.pocketcloud.threadpool.consts.QueueTypeConst;

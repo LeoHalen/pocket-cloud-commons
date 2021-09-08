@@ -66,6 +66,10 @@ public class DynamicThreadPoolExecutor extends ThreadPoolExecutor {
         this.listener = null;
     }
 
+
+    /**
+     * A custom reject policy class of {@link RejectedExecutionHandler} implements
+     */
     public static class DynamicDiscardPolicy implements RejectedExecutionHandler {
 
         private String threadPoolName;
