@@ -77,6 +77,11 @@ public class DynamicThreadPoolProperties {
     private int defaultQueueSizeRejectionThreshold = (int) (defaultMaxQueueSize * 0.8);
 
     /**
+     * 预热是否打开, 默认关闭
+     */
+    private boolean defaultPreheatEnabled = Boolean.FALSE;
+
+    /**
      * 懒加载模式开关, 默认打开
      * @Describe 懒加载模式打开后，线程池执行器的初始化时机为第一次获取时
      */
@@ -91,6 +96,7 @@ public class DynamicThreadPoolProperties {
     private final ThreadPoolProperty<Boolean> fair;
     private final ThreadPoolProperty<Integer> queueSizeRejectionThreshold;
     private final ThreadPoolProperty<String> rejectedExecutionType;
+    private final ThreadPoolProperty<Boolean> preheatEnabled;
 //    private final ThreadPoolProperty<Boolean> allowMaximumSizeToDivergeFromCoreSize;
 //    private final ThreadPoolProperty<Integer> threadPoolRollingNumberStatisticalWindowInMilliseconds;
 //    private final ThreadPoolProperty<Integer> threadPoolRollingNumberStatisticalWindowBuckets;
@@ -115,6 +121,7 @@ public class DynamicThreadPoolProperties {
         this.fair = getProperty(propertyPrefix, key, "fair", builder.getFair(), defaultFair);
         this.queueSizeRejectionThreshold = getProperty(propertyPrefix, key, "queueSizeRejectionThreshold", builder.getQueueSizeRejectionThreshold(), defaultQueueSizeRejectionThreshold);
         this.rejectedExecutionType = getProperty(propertyPrefix, key, "rejectedExecutionType", builder.getRejectedExecutionType(), defaultRejectedExecutionType);
+        this.preheatEnabled = getProperty(propertyPrefix, key, "preheatEnabled", builder.getPreheatEnabled(), defaultPreheatEnabled);
     }
 
     private static ThreadPoolProperty<Integer> getProperty(String propertyPrefix, DynamicThreadPoolKey key, String instanceProperty, Integer builderOverrideValue, Integer defaultValue) {
@@ -168,6 +175,7 @@ public class DynamicThreadPoolProperties {
         private Boolean fair;
         private String rejectedExecutionType = null;
         private Integer queueSizeRejectionThreshold = null;
+        private Boolean preheatEnabled = null;
 
         /* package */ Setter() {
         }
@@ -223,5 +231,9 @@ public class DynamicThreadPoolProperties {
             return this;
         }
 
+        public Setter withPreheatEnabled(boolean value) {
+            this.preheatEnabled = value;
+            return this;
+        }
     }
 }

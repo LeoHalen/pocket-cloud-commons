@@ -21,5 +21,6 @@ pocket:
 dynamic:
   threadpool:
     test-executor:
-      corePoolSize: 1
+      corePoolSize: 2
       maximumPoolSize: 4
+      preheatEnabled: true

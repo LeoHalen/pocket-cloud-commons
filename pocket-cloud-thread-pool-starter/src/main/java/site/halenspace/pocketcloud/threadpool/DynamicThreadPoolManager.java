@@ -98,7 +98,6 @@ public class DynamicThreadPoolManager {
         return DynamicThreadPool.Factory.getInstance(threadPoolKey, builder);
     }
 
-
     /**
      * Refresh Configuration updates to the {@link DynamicThreadPoolExecutor}.
      *

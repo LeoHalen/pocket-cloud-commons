@@ -1,6 +1,7 @@
 package site.halenspace.pocketcloud.threadpool.springmock.controller;
 
 import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.Test;
 import org.springframework.web.bind.annotation.*;
 import site.halenspace.pocketcloud.threadpool.DynamicThreadPoolKey;
 import site.halenspace.pocketcloud.threadpool.DynamicThreadPoolManager;
@@ -17,7 +18,7 @@ import java.util.concurrent.ExecutorService;
 @RequestMapping("/test/executor")
 public class TestExecutorController {
 
-    private final DynamicThreadPoolKey threadPoolKey = DynamicThreadPoolKey.Factory.asKey("test_pool_key");
+    private final DynamicThreadPoolKey threadPoolKey = DynamicThreadPoolKey.Factory.asKey("test-executor");
 
     @GetMapping("test1")
     public void testController() {
@@ -89,5 +90,13 @@ public class TestExecutorController {
                 System.out.println(threadPoolKey + "线程池实例 | 当前线程名：" + currentThreadName);
             });
         }
+    }
+
+    @GetMapping("mock-thread-pool-executor-preheat-all-threads")
+    public void mockThreadPoolExecutorPreheatAllThreads() {
+        System.setProperty("thread.pool.plugin.ThreadPoolDynamicProperties.implementation",
+                "site.halenspace.pocketcloud.threadpool.javamock.ThreadPoolPluginsMock$ThreadPoolDynamicPropertiesMockSpringBoot");
+        ExecutorService executorService = DynamicThreadPoolManager.getInstance().getExecutorOrCreateDefault(threadPoolKey);
+        System.out.println(threadPoolKey + "线程池实例 | Mock预热所有线程池");
     }
 }
