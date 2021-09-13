@@ -20,7 +20,6 @@ import java.util.concurrent.TimeUnit;
  */
 @Slf4j
 @Data
-//@ConfigurationProperties(prefix = "pocket.dynamic-thread-pool")
 public class DynamicThreadPoolProperties {
 
     /**

@@ -10,4 +10,8 @@ public interface ExecutorListener {
     void afterExecute(Runnable r);
 
     void throwableExecute(Runnable r, Throwable t);
+
+    // TODO 超过队列长度通知
+
+    // TODO 触发拒绝策略通知
 }
