@@ -112,8 +112,6 @@ public class DynamicThreadPoolProperties {
 
     protected DynamicThreadPoolProperties(DynamicThreadPoolKey key, Setter builder, String propertyPrefix) {
         this.corePoolSize = getProperty(propertyPrefix, key, "corePoolSize", builder.getCorePoolSize(), defaultCorePoolSize);
-        //this object always contains a reference to the configuration value for the maximumSize of the threadpool
-        //it only gets applied if allowMaximumSizeToDivergeFromCoreSize is true
         this.maximumPoolSize = getProperty(propertyPrefix, key, "maximumPoolSize", builder.getMaximumPoolSize(), defaultMaximumPoolSize);
         this.keepAliveTime = getProperty(propertyPrefix, key, "keepAliveTime", builder.getKeepAliveTime(), defaultKeepAliveTime);
         this.queueType = getProperty(propertyPrefix, key, "queueType", builder.getQueueType(), defaultQueueType);
