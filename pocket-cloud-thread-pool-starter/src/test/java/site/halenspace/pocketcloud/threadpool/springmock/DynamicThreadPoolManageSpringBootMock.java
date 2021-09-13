@@ -11,7 +11,7 @@ import java.util.concurrent.ExecutorService;
  * @author Halen Leo · 2021/7/6
  */
 //@RunWith(SpringJUnit4ClassRunner.class)
-@SpringBootTest(classes = { TestApplication.class, DynamicThreadPoolAutoConfiguration.class})
+@SpringBootTest(classes = { TestApplication.class})
 public class DynamicThreadPoolManageSpringBootMock {
 
     private final DynamicThreadPoolKey threadPoolKey = DynamicThreadPoolKey.Factory.asKey("testExecutor");
