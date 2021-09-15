@@ -32,6 +32,13 @@ public interface ThreadPoolDynamicProperties {
     ThreadPoolDynamicProperty<Long> getLong(String name, Long fallback);
     /**
      * Requests a property that may or may not actually exist.
+     * @param name property name, never <code>null</code>
+     * @param fallback default value, maybe <code>null</code>
+     * @return never <code>null</code>
+     */
+    ThreadPoolDynamicProperty<Float> getFloat(String name, Float fallback);
+    /**
+     * Requests a property that may or may not actually exist.
      * @param name property name
      * @param fallback default value
      * @return never <code>null</code>
@@ -63,6 +70,9 @@ public interface ThreadPoolDynamicProperties {
             }
             else if (type == Long.class) {
                 return delegate.getLong(name, (Long) fallback);
+            }
+            else if (type == Float.class) {
+                return delegate.getFloat(name, (Float) fallback);
             }
             else if (type == Boolean.class) {
                 return delegate.getBoolean(name, (Boolean) fallback);

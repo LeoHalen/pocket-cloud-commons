@@ -11,7 +11,7 @@ public interface ExecutorListener {
 
     void throwableExecute(Runnable r, Throwable t);
 
-    // TODO 超过队列长度通知
+    void taskThresholdTrigger(int threshold, float loadFactor, int waitingTask);
 
     // TODO 触发拒绝策略通知
 }

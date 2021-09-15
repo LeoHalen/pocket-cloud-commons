@@ -147,6 +147,9 @@ public class ThreadPoolPropertiesChainedProperty {
     public static ChainBuilder<Long> forLong() {
         return forType(Long.class);
     }
+    public static ChainBuilder<Float> forFloat() {
+        return forType(Float.class);
+    }
 
     private static class ChainThreadPoolProperty<T> implements ThreadPoolDynamicProperty<T> {
         private final ChainProperty<T> property;

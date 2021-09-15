@@ -1,8 +1,7 @@
 package site.halenspace.pocketcloud.threadpool.javamock;
 
-import site.halenspace.pocketcloud.threadpool.DynamicThreadPoolKey;
-import site.halenspace.pocketcloud.threadpool.DynamicThreadPoolManager;
-import site.halenspace.pocketcloud.threadpool.ExecutorListener;
+import site.halenspace.pocketcloud.threadpool.*;
+import site.halenspace.pocketcloud.threadpool.consts.QueueTypeConst;
 
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -21,6 +20,7 @@ public class ExecutorListenerMock {
 //        mockNoneOfTheThreadsThrowableExecute();
 //        mockTheThreadsThrowableExecuteSuccess();
 //        mockSubmitHandlerThrowableExecuteSuccess();
+        mockQueueTaskThresholdTrigger();
     }
 
     /**
@@ -142,6 +142,36 @@ public class ExecutorListenerMock {
     }
 
     /**
+     * mock使用过程中需要的注意事项 -> 重写Listener的taskThresholdTrigger, 线程成功回调此方法
+     *  note:
+     */
+    public static void mockQueueTaskThresholdTrigger() throws InterruptedException, ExecutionException {
+        System.setProperty("dynamic.threadpool.testExecutor.corePoolSize", "2");
+        System.setProperty("dynamic.threadpool.testExecutor.maximumPoolSize", "2");
+        System.setProperty("dynamic.threadpool.testExecutor.queueType", QueueTypeConst.LinkedBlockingQueue);
+        System.setProperty("dynamic.threadpool.testExecutor.maxQueueSize", "10");
+
+        DynamicThreadPoolKey threadPoolKey = DynamicThreadPoolKey.Factory.asKey("testExecutor");
+        DynamicThreadPoolExecutor executorService = (DynamicThreadPoolExecutor) DynamicThreadPoolManager.getInstance().getExecutorOrCreateDefault(threadPoolKey);
+        MockExecutorListener listener = new MockExecutorListener();
+        DynamicThreadPoolManager.getInstance().addExecutorListener(threadPoolKey, listener);
+
+        int i = 13;
+        while (i-- > 0) {
+            Future<?> resultFuture = executorService.submit(() -> {
+                System.out.println(threadPoolKey + "线程池实例 | 当前线程名: " + Thread.currentThread().getName());
+                try {
+                    Thread.sleep(2000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            });
+            resultFuture.get();
+        }
+        Thread.sleep(5000);
+    }
+
+    /**
      * Mock interface {@link ExecutorListener} implements
      */
     public static class MockExecutorListener implements ExecutorListener {
@@ -159,6 +189,11 @@ public class ExecutorListenerMock {
         @Override
         public void throwableExecute(Runnable r, Throwable t) {
             System.out.println("线程执行后 | Runnable: " + r.toString() + "异常: " + t.toString());
+        }
+
+        @Override
+        public void taskThresholdTrigger(int threshold, float loadFactor, int waitingTask) {
+            System.out.println("队列负载触发阈值 | threshold: " + threshold + "loadFactor: " + loadFactor + "waitingTask: " + waitingTask);
         }
     }
 }

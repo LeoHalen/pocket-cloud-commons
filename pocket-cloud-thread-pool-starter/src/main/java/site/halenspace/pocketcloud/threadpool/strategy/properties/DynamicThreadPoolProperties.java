@@ -30,61 +30,66 @@ public class DynamicThreadPoolProperties {
     /**
      * 核心线程数, 默认值为CPU核心数量
      */
-    private int defaultCorePoolSize = Runtime.getRuntime().availableProcessors();
+    private final int defaultCorePoolSize = Runtime.getRuntime().availableProcessors();
 
     /**
      * 最大线程数, 默认值为(2 * CPU核心数量)
      */
-    private int defaultMaximumPoolSize = 2 * Runtime.getRuntime().availableProcessors();
+    private final int defaultMaximumPoolSize = 2 * Runtime.getRuntime().availableProcessors();
 
     /**
      * 空闲线程存活时间
      */
-    private long defaultKeepAliveTime = 60;
+    private final long defaultKeepAliveTime = 60;
 
     /**
      * 空闲线程存活时间单位, 默认为秒
      * @See TimeUnit
      */
-    private TimeUnit defaultTimeUnit = TimeUnit.SECONDS;
+    private final TimeUnit defaultTimeUnit = TimeUnit.SECONDS;
 
     /**
      * 队列最大数量
      */
-    private int defaultMaxQueueSize = Integer.MAX_VALUE;
+    private final int defaultMaxQueueSize = Integer.MAX_VALUE;
 
     /**
      * 队列类型
      * @see QueueTypeConst
      */
-    private String defaultQueueType = QueueTypeConst.LinkedBlockingQueue;
+    private final String defaultQueueType = QueueTypeConst.LinkedBlockingQueue;
 
     /**
      * SynchronousQueue 是否公平策略
      */
-    private boolean defaultFair = Boolean.FALSE;
+    private final boolean defaultFair = Boolean.FALSE;
 
     /**
      * 拒绝策略, 默认丢弃任务并抛出异常
      * @see RejectedExecutionHandlerTypeConst
      */
-    private String defaultRejectedExecutionType = RejectedExecutionHandlerTypeConst.AbortPolicy;
+    private final String defaultRejectedExecutionType = RejectedExecutionHandlerTypeConst.AbortPolicy;
+
+    /**
+     * 队列负载因子, 默认为最大值1
+     */
+    private final float defaultQueueWarningLoadFactor = 1F;
 
     /**
      * 队列容量告警阀值, 默认为队列容量
      */
-    private int defaultQueueSizeRejectionThreshold = (int) (defaultMaxQueueSize * 0.8);
+//    private final int defaultQueueSizeWarningThreshold = (int) (defaultMaxQueueSize * defaultQueueWarningLoadFactor);
 
     /**
      * 预热是否打开, 默认关闭
      */
-    private boolean defaultPreheatEnabled = Boolean.FALSE;
+    private final boolean defaultPreheatEnabled = Boolean.FALSE;
 
     /**
      * 懒加载模式开关, 默认打开
      * @Describe 懒加载模式打开后，线程池执行器的初始化时机为第一次获取时
      */
-    private boolean lazyModeEnabled = true;
+    private final boolean lazyModeEnabled = Boolean.TRUE;
 
 
     private final ThreadPoolProperty<Integer> corePoolSize;
@@ -93,8 +98,8 @@ public class DynamicThreadPoolProperties {
     private final ThreadPoolProperty<String> queueType;
     private final ThreadPoolProperty<Integer> maxQueueSize;
     private final ThreadPoolProperty<Boolean> fair;
-    private final ThreadPoolProperty<Integer> queueSizeRejectionThreshold;
     private final ThreadPoolProperty<String> rejectedExecutionType;
+    private final ThreadPoolProperty<Float> queueWarningLoadFactor;
     private final ThreadPoolProperty<Boolean> preheatEnabled;
 //    private final ThreadPoolProperty<Boolean> allowMaximumSizeToDivergeFromCoreSize;
 //    private final ThreadPoolProperty<Integer> threadPoolRollingNumberStatisticalWindowInMilliseconds;
@@ -116,7 +121,7 @@ public class DynamicThreadPoolProperties {
         this.queueType = getProperty(propertyPrefix, key, "queueType", builder.getQueueType(), defaultQueueType);
         this.maxQueueSize = getProperty(propertyPrefix, key, "maxQueueSize", builder.getMaxQueueSize(), defaultMaxQueueSize);
         this.fair = getProperty(propertyPrefix, key, "fair", builder.getFair(), defaultFair);
-        this.queueSizeRejectionThreshold = getProperty(propertyPrefix, key, "queueSizeRejectionThreshold", builder.getQueueSizeRejectionThreshold(), defaultQueueSizeRejectionThreshold);
+        this.queueWarningLoadFactor = getProperty(propertyPrefix, key, "queueWarningLoadFactor", builder.getQueueWarningLoadFactor(), defaultQueueWarningLoadFactor);
         this.rejectedExecutionType = getProperty(propertyPrefix, key, "rejectedExecutionType", builder.getRejectedExecutionType(), defaultRejectedExecutionType);
         this.preheatEnabled = getProperty(propertyPrefix, key, "preheatEnabled", builder.getPreheatEnabled(), defaultPreheatEnabled);
     }
@@ -137,6 +142,13 @@ public class DynamicThreadPoolProperties {
 
     private static ThreadPoolProperty<Long> getProperty(String propertyPrefix, DynamicThreadPoolKey key, String instanceProperty, Long builderOverrideValue, Long defaultValue) {
         return ThreadPoolPropertiesChainedProperty.forLong()
+                .add(propertyPrefix + ".threadpool." + key.name() + "." + instanceProperty, builderOverrideValue)
+                .add(propertyPrefix + ".threadpool.default." + instanceProperty, defaultValue)
+                .build();
+    }
+
+    private static ThreadPoolProperty<Float> getProperty(String propertyPrefix, DynamicThreadPoolKey key, String instanceProperty, Float builderOverrideValue, Float defaultValue) {
+        return ThreadPoolPropertiesChainedProperty.forFloat()
                 .add(propertyPrefix + ".threadpool." + key.name() + "." + instanceProperty, builderOverrideValue)
                 .add(propertyPrefix + ".threadpool.default." + instanceProperty, defaultValue)
                 .build();
@@ -171,7 +183,7 @@ public class DynamicThreadPoolProperties {
         private String queueType = null;
         private Boolean fair;
         private String rejectedExecutionType = null;
-        private Integer queueSizeRejectionThreshold = null;
+        private Float queueWarningLoadFactor = null;
         private Boolean preheatEnabled = null;
 
         /* package */ Setter() {
@@ -223,8 +235,8 @@ public class DynamicThreadPoolProperties {
             return this;
         }
 
-        public Setter withQueueSizeRejectionThreshold(int value) {
-            this.queueSizeRejectionThreshold = value;
+        public Setter withQueueWarningLoadFactor(float value) {
+            this.queueWarningLoadFactor = value;
             return this;
         }
 

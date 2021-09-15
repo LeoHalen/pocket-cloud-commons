@@ -91,6 +91,9 @@ public class TestExecutorController {
         }
     }
 
+    /**
+     * 执行此方法后Arthas监控线程创建情况
+     */
     @GetMapping("mock-thread-pool-executor-preheat-all-threads")
     public void mockThreadPoolExecutorPreheatAllThreads() {
         System.setProperty("thread.pool.plugin.ThreadPoolDynamicProperties.implementation",
@@ -98,4 +101,12 @@ public class TestExecutorController {
         ExecutorService executorService = DynamicThreadPoolManager.getInstance().getExecutorOrCreateDefault(threadPoolKey);
         System.out.println(threadPoolKey + "线程池实例 | Mock预热所有线程池");
     }
+
+//    @GetMapping("mock-thread-pool-executor-preheat-all-threads")
+//    public void mockQueueLoadThreshold() {
+//        System.setProperty("thread.pool.plugin.ThreadPoolDynamicProperties.implementation",
+//                "site.halenspace.pocketcloud.threadpool.javamock.ThreadPoolPluginsMock$ThreadPoolDynamicPropertiesMockSpringBoot");
+//        ExecutorService executorService = DynamicThreadPoolManager.getInstance().getExecutorOrCreateDefault(threadPoolKey);
+//        System.out.println(threadPoolKey + "线程池实例 | Mock预热所有线程池");
+//    }
 }

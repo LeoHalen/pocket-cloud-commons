@@ -281,6 +281,24 @@ public class ThreadPoolPropertiesChainedArchaiusProperty {
         }
     }
 
+    public static class DynamicFloatProperty extends PropertyWrapper<Float> {
+        public DynamicFloatProperty(String propName, Float defaultValue) {
+            super(propName, defaultValue);
+        }
+
+        /**
+         * Get the current value from the underlying DynamicProperty
+         */
+        public Float get() {
+            return prop.getFloat(defaultValue);
+        }
+
+        @Override
+        public Float getValue() {
+            return get();
+        }
+    }
+
     public static class DynamicStringProperty extends PropertyWrapper<String> {
         public DynamicStringProperty(String propName, String defaultValue) {
             super(propName, defaultValue);

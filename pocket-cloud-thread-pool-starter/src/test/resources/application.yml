@@ -24,3 +24,5 @@ dynamic:
       corePoolSize: 2
       maximumPoolSize: 4
       preheatEnabled: true
+      queueType: LinkedBlockingQueue
+      maxQueueSize: 10

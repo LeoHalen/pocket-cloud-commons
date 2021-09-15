@@ -81,6 +81,30 @@ public final class ThreadPoolDynamicPropertiesSystemProperties implements Thread
     }
 
     @Override
+    public ThreadPoolDynamicProperty<Float> getFloat(String name, Float fallback) {
+        return new ThreadPoolDynamicProperty<Float>() {
+
+            @Override
+            public Float get() {
+                String v;
+                if ((v = System.getProperty(name)) == null) {
+                    return fallback;
+                }
+                return Float.parseFloat(v);
+            }
+
+            @Override
+            public String getName() {
+                return name;
+            }
+
+            @Override
+            public void addCallback(Runnable callback) {
+            }
+        };
+    }
+
+    @Override
     public ThreadPoolDynamicProperty<Boolean> getBoolean(final String name, final Boolean fallback) {
         return new ThreadPoolDynamicProperty<Boolean>() {
 

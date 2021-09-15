@@ -79,6 +79,26 @@ public class ThreadPoolPluginsMock {
         }
 
         @Override
+        public ThreadPoolDynamicProperty<Float> getFloat(String name, Float fallback) {
+            return new ThreadPoolDynamicProperty<Float>() {
+
+                @Override
+                public Float get() {
+                    return env.getProperty(name, Float.class, fallback);
+                }
+
+                @Override
+                public String getName() {
+                    return name;
+                }
+
+                @Override
+                public void addCallback(Runnable callback) {
+                }
+            };
+        }
+
+        @Override
         public ThreadPoolDynamicProperty<Boolean> getBoolean(String name, Boolean fallback) {
             return new ThreadPoolDynamicProperty<Boolean>() {
 

@@ -9,10 +9,7 @@ package site.halenspace.pocketcloud.threadpool;
  */
 public interface ThreadPoolFactory<E, K, P> {
 
-    /**
-     * 创建线程池
-     * @param p
-     * @return
-     */
-    E getThreadPool(K k, P p);
+    E getThreadPoolExecutor(K k, P p);
+
+    E getThreadPoolExecutor(K k, P p, ExecutorListener listener);
 }

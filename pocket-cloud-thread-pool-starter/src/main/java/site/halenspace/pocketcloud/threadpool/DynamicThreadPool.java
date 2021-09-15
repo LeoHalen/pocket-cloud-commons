@@ -2,6 +2,7 @@ package site.halenspace.pocketcloud.threadpool;
 
 import lombok.extern.slf4j.Slf4j;
 import site.halenspace.pocketcloud.threadpool.builder.RejectedExecutionBuilder;
+import site.halenspace.pocketcloud.threadpool.consts.QueueTypeConst;
 import site.halenspace.pocketcloud.threadpool.queue.ResizableLinkedBlockingQueue;
 import site.halenspace.pocketcloud.threadpool.strategy.properties.DynamicThreadPoolProperties;
 import site.halenspace.pocketcloud.threadpool.strategy.properties.factory.DynamicThreadPoolPropertiesFactory;
@@ -68,7 +69,7 @@ public interface DynamicThreadPool {
 
         private final DynamicThreadPoolKey threadPoolKey;
         private final DynamicThreadPoolProperties properties;
-        private final DynamicThreadPoolExecutor threadPool;
+        private final DynamicThreadPoolExecutor threadPoolExecutor;
         private final BlockingQueue<Runnable> workingQueue;
         private final int queueSize;
 
@@ -79,10 +80,9 @@ public interface DynamicThreadPool {
         public DynamicThreadPoolDefault(DynamicThreadPoolKey threadPoolKey, DynamicThreadPoolProperties.Setter builder, ExecutorListener listener) {
             this.threadPoolKey = threadPoolKey;
             this.properties = DynamicThreadPoolPropertiesFactory.getThreadPoolProperties(threadPoolKey, builder);
-            this.threadPool = DynamicThreadPoolFactory.getInstance().getThreadPool(threadPoolKey, this.properties);
-            this.threadPool.addListener(listener);
+            this.threadPoolExecutor = DynamicThreadPoolFactory.getInstance().getThreadPoolExecutor(threadPoolKey, this.properties);
             this.preheatAllCoreThreads();
-            this.workingQueue = this.threadPool.getQueue();
+            this.workingQueue = this.threadPoolExecutor.getQueue();
             this.queueSize = this.properties.getMaxQueueSize().get();
         }
 
@@ -93,13 +93,13 @@ public interface DynamicThreadPool {
             if (log.isDebugEnabled()) {
                 log.debug("Dynamic thread pool preheat for: {} preheat all core threads", threadPoolKey.name());
             }
-            this.threadPool.prestartAllCoreThreads();
+            this.threadPoolExecutor.prestartAllCoreThreads();
         }
 
         @Override
         public ExecutorService getExecutor() {
             refreshExecutor();
-            return threadPool;
+            return threadPoolExecutor;
         }
 
         @Override
@@ -109,6 +109,8 @@ public interface DynamicThreadPool {
             int dynamicMaximumPoolSize = properties.getMaximumPoolSize().get();
             final long dynamicKeepAliveTime = properties.getKeepAliveTime().get();
             final int dynamicMaxQueueSize = properties.getMaxQueueSize().get();
+            final float dynamicQueueWarningLoadFactor = properties.getQueueWarningLoadFactor().get();
+            final int dynamicQueueSizeWarningThreshold = (int) (dynamicMaxQueueSize * dynamicQueueWarningLoadFactor);
             final boolean dynamicFair = properties.getFair().get();
             final RejectedExecutionHandler rejectedExecutionHandler = RejectedExecutionBuilder.build(properties.getRejectedExecutionType().get());
             boolean maxTooLow = false;
@@ -119,22 +121,24 @@ public interface DynamicThreadPool {
             }
 
             // In JDK 6, setCorePoolSize and setMaximumPoolSize will execute a lock operation. Avoid them if the pool size is not changed.
-            if (threadPool.getCorePoolSize() != dynamicCorePoolSize || threadPool.getMaximumPoolSize() != dynamicMaximumPoolSize) {
+            if (threadPoolExecutor.getCorePoolSize() != dynamicCorePoolSize || threadPoolExecutor.getMaximumPoolSize() != dynamicMaximumPoolSize) {
                 if (maxTooLow) {
                     log.error("Dynamic thread pool configuration at refresh executor for: " +
                                     "{} is trying to set coreSize = {} and maximumSize = {}. MaximumSize will be set to {}, " +
                                     "the coreSize value, since it must be equal to or greater than the coreSize value",
                             threadPoolKey.name(), dynamicCorePoolSize, dynamicMaximumPoolSize, dynamicCorePoolSize);
                 }
-                threadPool.setCorePoolSize(dynamicCorePoolSize);
-                threadPool.setMaximumPoolSize(dynamicMaximumPoolSize);
+                threadPoolExecutor.setCorePoolSize(dynamicCorePoolSize);
+                threadPoolExecutor.setMaximumPoolSize(dynamicMaximumPoolSize);
             }
 
-            threadPool.setKeepAliveTime(dynamicKeepAliveTime, properties.getDefaultTimeUnit());
-            if (threadPool.getQueue() instanceof ResizableLinkedBlockingQueue && dynamicMaxQueueSize > 0) {
-                ((ResizableLinkedBlockingQueue<Runnable>) threadPool.getQueue()).setCapacity(dynamicMaxQueueSize);
+            threadPoolExecutor.setKeepAliveTime(dynamicKeepAliveTime, properties.getDefaultTimeUnit());
+            if (threadPoolExecutor.getQueue() instanceof ResizableLinkedBlockingQueue && dynamicMaxQueueSize > 0) {
+                ((ResizableLinkedBlockingQueue<Runnable>) threadPoolExecutor.getQueue()).setCapacity(dynamicMaxQueueSize);
             }
-            threadPool.setRejectedExecutionHandler(rejectedExecutionHandler);
+            threadPoolExecutor.setBoundedQueueLoadFactor(dynamicQueueWarningLoadFactor);
+            threadPoolExecutor.setBoundedQueueSizeWarningThreshold(dynamicQueueSizeWarningThreshold);
+            threadPoolExecutor.setRejectedExecutionHandler(rejectedExecutionHandler);
             // TODO 后期想办法看是否可以更换队列类型
             // TODO 后续考虑是否将SynchronousQueue公平属性支持动态修改
 //            if (threadPool.getQueue() instanceof SynchronousQueue) {

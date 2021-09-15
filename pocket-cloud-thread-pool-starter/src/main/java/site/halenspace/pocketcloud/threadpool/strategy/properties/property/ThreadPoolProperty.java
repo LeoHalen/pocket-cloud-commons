@@ -1,10 +1,6 @@
 package site.halenspace.pocketcloud.threadpool.strategy.properties.property;
 
-import site.halenspace.pocketcloud.threadpool.strategy.properties.archaius.ThreadPoolPropertiesChainedArchaiusProperty;
-import site.halenspace.pocketcloud.threadpool.strategy.properties.archaius.ThreadPoolPropertiesChainedArchaiusProperty.DynamicIntegerProperty;
-import site.halenspace.pocketcloud.threadpool.strategy.properties.archaius.ThreadPoolPropertiesChainedArchaiusProperty.DynamicLongProperty;
-import site.halenspace.pocketcloud.threadpool.strategy.properties.archaius.ThreadPoolPropertiesChainedArchaiusProperty.DynamicStringProperty;
-import site.halenspace.pocketcloud.threadpool.strategy.properties.archaius.ThreadPoolPropertiesChainedArchaiusProperty.DynamicBooleanProperty;
+import site.halenspace.pocketcloud.threadpool.strategy.properties.archaius.ThreadPoolPropertiesChainedArchaiusProperty.*;
 
 /**
  * @author Halen Leo · 2021/9/5
@@ -32,6 +28,10 @@ public interface ThreadPoolProperty<T> {
         }
 
         public static ThreadPoolProperty<Boolean> asProperty(final DynamicBooleanProperty value) {
+            return value::get;
+        }
+
+        public static ThreadPoolProperty<Float> asProperty(final DynamicFloatProperty value) {
             return value::get;
         }
 
@@ -64,7 +64,7 @@ public interface ThreadPoolProperty<T> {
             };
         }
 
-        public static <T> ThreadPoolProperty<T> asProperty(final ThreadPoolPropertiesChainedArchaiusProperty.ChainLink<T> chainedProperty) {
+        public static <T> ThreadPoolProperty<T> asProperty(final ChainLink<T> chainedProperty) {
             return chainedProperty::get;
         }
 

@@ -11,15 +11,19 @@ public interface QueueTypeConst {
 
     String LinkedBlockingQueue = "LinkedBlockingQueue";
 
-    String SynchronousQueue = "SynchronousQueue";
-
     String ArrayBlockingQueue = "ArrayBlockingQueue";
+
+    String LinkedBlockingDeque = "LinkedBlockingDeque";
+
+    String SynchronousQueue = "SynchronousQueue";
 
     String DelayQueue = "DelayQueue";
 
     String LinkedTransferQueue = "LinkedTransferQueue";
 
-    String LinkedBlockingDeque = "LinkedBlockingDeque";
-
     String PriorityBlockingQueue = "PriorityBlockingQueue";
+
+    static boolean isBoundedQueue(String queueType) {
+        return LinkedBlockingQueue.equals(queueType) || ArrayBlockingQueue.equals(queueType) || LinkedBlockingDeque.equals(queueType);
+    }
 }

@@ -15,6 +15,8 @@ import java.util.concurrent.*;
 @Slf4j
 public class DynamicThreadPoolExecutor extends ThreadPoolExecutor {
 
+    private Float boundedQueueLoadFactor;
+    private Integer boundedQueueSizeWarningThreshold;
     private ExecutorListener listener;
 
     public DynamicThreadPoolExecutor(int corePoolSize, int maximumPoolSize, long keepAliveTime, TimeUnit unit,
@@ -38,6 +40,15 @@ public class DynamicThreadPoolExecutor extends ThreadPoolExecutor {
     }
 
     @Override
+    public void execute(Runnable command) {
+        super.execute(command);
+        int waitingTask;
+        if (boundedQueueSizeWarningThreshold != null && (waitingTask = super.getQueue().size()) >= boundedQueueSizeWarningThreshold) {
+            listener.taskThresholdTrigger(boundedQueueSizeWarningThreshold, boundedQueueLoadFactor, waitingTask);
+        }
+    }
+
+    @Override
     protected void beforeExecute(Thread t, Runnable r) {
         if (listener != null) {
             listener.beforeExecute(t, r);
@@ -58,6 +69,22 @@ public class DynamicThreadPoolExecutor extends ThreadPoolExecutor {
         super.terminated();
     }
 
+    public Float getBoundedQueueLoadFactor() {
+        return boundedQueueLoadFactor;
+    }
+
+    public void setBoundedQueueLoadFactor(Float boundedQueueLoadFactor) {
+        this.boundedQueueLoadFactor = boundedQueueLoadFactor;
+    }
+
+    public Integer getBoundedQueueSizeWarningThreshold() {
+        return boundedQueueSizeWarningThreshold;
+    }
+
+    public void setBoundedQueueSizeWarningThreshold(Integer boundedQueueSizeWarningThreshold) {
+        this.boundedQueueSizeWarningThreshold = boundedQueueSizeWarningThreshold;
+    }
+
     protected void addListener(ExecutorListener listener) {
         this.listener = listener;
     }
@@ -65,7 +92,6 @@ public class DynamicThreadPoolExecutor extends ThreadPoolExecutor {
     protected void removeListener() {
         this.listener = null;
     }
-
 
     /**
      * A custom reject policy class of {@link RejectedExecutionHandler} implements
