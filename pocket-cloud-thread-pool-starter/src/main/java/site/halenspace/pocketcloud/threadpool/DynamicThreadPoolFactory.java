@@ -48,12 +48,14 @@ public class DynamicThreadPoolFactory implements
         final BlockingQueue<Runnable> workingQueue = getBlockingQueue(properties);
         final String queType = properties.getQueueType().get();
         final int queueSize = properties.getMaxQueueSize().get();
-        final float queueWarningLoadFactor = properties.getQueueWarningLoadFactor().get();
+        final float dynamicQueueWarningLoadFactor = properties.getQueueWarningLoadFactor().get();
+        final long dynamicQueueThresholdValveOpenRollingWindowInMinutes = properties.getQueueThresholdValveOpenRollingWindowInMinutes().get();
         final ThreadFactory threadFactory = getThreadFactory(threadPoolKey);
         final RejectedExecutionHandler rejectedExecution = getRejectedExecution(properties);
 
+        DynamicThreadPoolExecutor threadPoolExecutor = null;
         if (dynamicCorePoolSize > dynamicMaximumPoolSize) {
-            log.error("Dynamic thread pool factory at initialize for: " +
+            log.info("Dynamic thread pool factory at initialize for: " +
                             "{} is trying to set corePoolSize = {} and maximumPoolSize = {}. MaximumPoolSize will be set to {}, " +
                             "the coreSize value, since it must be equal to or greater than the coreSize value",
                     threadPoolName, dynamicCorePoolSize, dynamicMaximumPoolSize, dynamicCorePoolSize);
@@ -63,29 +65,32 @@ public class DynamicThreadPoolFactory implements
                         threadPoolName, dynamicCorePoolSize, dynamicCorePoolSize, dynamicKeepAliveTime,
                         defaultTimeUnit, properties.getQueueType().get(), properties.getRejectedExecutionType().get());
             }
-            DynamicThreadPoolExecutor threadPoolExecutor = new DynamicThreadPoolExecutor(
+            threadPoolExecutor = new DynamicThreadPoolExecutor(
                     dynamicCorePoolSize, dynamicCorePoolSize, dynamicKeepAliveTime, defaultTimeUnit, workingQueue, threadFactory, rejectedExecution);
-            if (QueueTypeConst.isBoundedQueue(queType)) {
-                threadPoolExecutor.setBoundedQueueLoadFactor(queueWarningLoadFactor);
-                threadPoolExecutor.setBoundedQueueSizeWarningThreshold((int) (queueSize * queueWarningLoadFactor));
-            }
-            threadPoolExecutor.addListener(listener);
-            return threadPoolExecutor;
         }
 
-        if (log.isDebugEnabled()) {
-            log.debug("Dynamic thread pool factory at initialize for: " +
-                            "{}(corePoolSize={},maximumPoolSize={},keepAliveTime={},timeUnit={},queue={},rejectedExecution={})",
-                    threadPoolName, dynamicCorePoolSize, dynamicMaximumPoolSize, dynamicKeepAliveTime,
-                    defaultTimeUnit, properties.getQueueType().get(), properties.getRejectedExecutionType().get());
+        if (threadPoolExecutor == null) {
+            if (log.isDebugEnabled()) {
+                log.debug("Dynamic thread pool factory at initialize for: " +
+                                "{}(corePoolSize={},maximumPoolSize={},keepAliveTime={},timeUnit={},queue={},rejectedExecution={})",
+                        threadPoolName, dynamicCorePoolSize, dynamicMaximumPoolSize, dynamicKeepAliveTime,
+                        defaultTimeUnit, properties.getQueueType().get(), properties.getRejectedExecutionType().get());
+            }
+            threadPoolExecutor = new DynamicThreadPoolExecutor(
+                    dynamicCorePoolSize, dynamicMaximumPoolSize, dynamicKeepAliveTime, defaultTimeUnit, workingQueue, threadFactory, rejectedExecution);
         }
-        DynamicThreadPoolExecutor threadPoolExecutor = new DynamicThreadPoolExecutor(
-                dynamicCorePoolSize, dynamicMaximumPoolSize, dynamicKeepAliveTime, defaultTimeUnit, workingQueue, threadFactory, rejectedExecution);
         if (QueueTypeConst.isBoundedQueue(queType)) {
-            threadPoolExecutor.setBoundedQueueLoadFactor(queueWarningLoadFactor);
-            threadPoolExecutor.setBoundedQueueSizeWarningThreshold((int) (queueSize * queueWarningLoadFactor));
+            threadPoolExecutor.setBoundedQueueLoadFactor(dynamicQueueWarningLoadFactor);
+            threadPoolExecutor.setBoundedQueueSizeWarningThreshold((int) (queueSize * dynamicQueueWarningLoadFactor));
+            threadPoolExecutor.setQueueThresholdValveOpenRollingWindowInMinutes(dynamicQueueThresholdValveOpenRollingWindowInMinutes);
         }
         threadPoolExecutor.addListener(listener);
+        if (properties.getPreheatEnabled().get()) {
+            if (log.isDebugEnabled()) {
+                log.debug("Dynamic thread pool preheat for: {} preheat all core threads", threadPoolKey.name());
+            }
+            threadPoolExecutor.prestartAllCoreThreads();
+        }
         return threadPoolExecutor;
     }
 

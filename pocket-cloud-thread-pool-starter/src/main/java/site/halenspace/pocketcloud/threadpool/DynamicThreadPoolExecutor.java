@@ -3,7 +3,9 @@ package site.halenspace.pocketcloud.threadpool;
 
 import lombok.extern.slf4j.Slf4j;
 
+import java.time.LocalDateTime;
 import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * 支持动态设置参数的线程池
@@ -18,6 +20,13 @@ public class DynamicThreadPoolExecutor extends ThreadPoolExecutor {
     private Float boundedQueueLoadFactor;
     private Integer boundedQueueSizeWarningThreshold;
     private ExecutorListener listener;
+    private Long queueThresholdValveOpenRollingWindowInMinutes;
+    private final AtomicBoolean queueThresholdValveOpen = new AtomicBoolean(false);
+    private LocalDateTime queueThresholdValveOpenWindowTime;
+//    private final AtomicReference<LocalDateTime> queueThresholdValveOpenWindowTime = new AtomicReference<>();
+//    private final AtomicInteger queueThresholdValveOpenWindowCounter = new AtomicInteger();
+//    private final Timer queueThresholdValveOpenRollingWindowTimer = new Timer();
+//    private boolean queueThresholdValveOpenRollingWindow;
 
     public DynamicThreadPoolExecutor(int corePoolSize, int maximumPoolSize, long keepAliveTime, TimeUnit unit,
                                      BlockingQueue<Runnable> workQueue) {
@@ -42,9 +51,49 @@ public class DynamicThreadPoolExecutor extends ThreadPoolExecutor {
     @Override
     public void execute(Runnable command) {
         super.execute(command);
-        int waitingTask;
-        if (boundedQueueSizeWarningThreshold != null && (waitingTask = super.getQueue().size()) >= boundedQueueSizeWarningThreshold) {
-            listener.taskThresholdTrigger(boundedQueueSizeWarningThreshold, boundedQueueLoadFactor, waitingTask);
+        boundedQueueMetricsListener();
+    }
+
+    private void boundedQueueMetricsListener() {
+        if (boundedQueueSizeWarningThreshold == null) {
+            return;
+        }
+        final int waitingTask;
+        if ((waitingTask = super.getQueue().size()) >= boundedQueueSizeWarningThreshold) {
+            if (queueThresholdValveOpen.compareAndSet(Boolean.FALSE, Boolean.TRUE)) {
+                listener.taskThresholdTrigger(boundedQueueSizeWarningThreshold, boundedQueueLoadFactor, waitingTask);
+                queueThresholdValveOpenWindowTime = LocalDateTime.now().plusMinutes(queueThresholdValveOpenRollingWindowInMinutes);
+                if (log.isDebugEnabled()) {
+                    log.debug("Dynamic thread pool key for: {} open queue threshold valve", Thread.currentThread().getName());
+                }
+//                queueThresholdValveOpenWindowCounter.incrementAndGet();
+//                queueThresholdValveOpenRollingWindowTimer.schedule(new TimerTask() {
+//                    @Override
+//                    public void run() {
+//                        if (queueThresholdValveOpen.get() && DynamicThreadPoolExecutor.super.getQueue().size() >= boundedQueueSizeWarningThreshold) {
+//                            listener.taskThresholdTrigger(boundedQueueSizeWarningThreshold, boundedQueueLoadFactor, waitingTask);
+//                        } else {
+//                            queueThresholdValveOpen.compareAndSet(Boolean.TRUE, Boolean.FALSE);
+//                        }
+//                    }
+//                }, queueThresholdValveOpenRollingWindowInMinutes);
+            } else {
+                if (!LocalDateTime.now().isBefore(queueThresholdValveOpenWindowTime)) {
+                    listener.taskThresholdTrigger(boundedQueueSizeWarningThreshold, boundedQueueLoadFactor, waitingTask);
+                    // open another window
+                    queueThresholdValveOpenWindowTime = LocalDateTime.now().plusMinutes(queueThresholdValveOpenRollingWindowInMinutes);
+                    if (log.isDebugEnabled()) {
+                        log.debug("Dynamic thread pool key for: {} open another window of queue threshold valve", Thread.currentThread().getName());
+                    }
+                }
+            }
+        } else {
+            // Closed queueThresholdValveOpen status
+            if (queueThresholdValveOpen.compareAndSet(Boolean.TRUE, Boolean.FALSE)) {
+                if (log.isDebugEnabled()) {
+                    log.debug("Dynamic thread pool key for: {} close queue threshold valve", Thread.currentThread().getName());
+                }
+            }
         }
     }
 
@@ -83,6 +132,14 @@ public class DynamicThreadPoolExecutor extends ThreadPoolExecutor {
 
     public void setBoundedQueueSizeWarningThreshold(Integer boundedQueueSizeWarningThreshold) {
         this.boundedQueueSizeWarningThreshold = boundedQueueSizeWarningThreshold;
+    }
+
+    public long getQueueThresholdValveOpenRollingWindowInMinutes() {
+        return queueThresholdValveOpenRollingWindowInMinutes;
+    }
+
+    public void setQueueThresholdValveOpenRollingWindowInMinutes(long queueThresholdValveOpenRollingWindowInMinutes) {
+        this.queueThresholdValveOpenRollingWindowInMinutes = queueThresholdValveOpenRollingWindowInMinutes;
     }
 
     protected void addListener(ExecutorListener listener) {

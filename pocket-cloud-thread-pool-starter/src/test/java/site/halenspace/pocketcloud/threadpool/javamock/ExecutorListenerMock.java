@@ -20,7 +20,8 @@ public class ExecutorListenerMock {
 //        mockNoneOfTheThreadsThrowableExecute();
 //        mockTheThreadsThrowableExecuteSuccess();
 //        mockSubmitHandlerThrowableExecuteSuccess();
-        mockQueueTaskThresholdTrigger();
+//        mockQueueTaskThresholdTrigger();
+        mockQueueTaskCustomThresholdTrigger();
     }
 
     /**
@@ -142,10 +143,10 @@ public class ExecutorListenerMock {
     }
 
     /**
-     * mock使用过程中需要的注意事项 -> 重写Listener的taskThresholdTrigger, 线程成功回调此方法
-     *  note:
+     * mock使用过程中需要的注意事项 -> 重写Listener的taskThresholdTrigger, 队列任务达到队列最大长度线程成功回调此方法
+     *  note: 如果使用submit方法并在主线程中get阻塞等待，则无法mock此功能
      */
-    public static void mockQueueTaskThresholdTrigger() throws InterruptedException, ExecutionException {
+    public static void mockQueueTaskDefaultThresholdTrigger() throws InterruptedException, ExecutionException {
         System.setProperty("dynamic.threadpool.testExecutor.corePoolSize", "2");
         System.setProperty("dynamic.threadpool.testExecutor.maximumPoolSize", "2");
         System.setProperty("dynamic.threadpool.testExecutor.queueType", QueueTypeConst.LinkedBlockingQueue);
@@ -156,9 +157,9 @@ public class ExecutorListenerMock {
         MockExecutorListener listener = new MockExecutorListener();
         DynamicThreadPoolManager.getInstance().addExecutorListener(threadPoolKey, listener);
 
-        int i = 13;
+        int i = 12;
         while (i-- > 0) {
-            Future<?> resultFuture = executorService.submit(() -> {
+            executorService.execute(() -> {
                 System.out.println(threadPoolKey + "线程池实例 | 当前线程名: " + Thread.currentThread().getName());
                 try {
                     Thread.sleep(2000);
@@ -166,9 +167,51 @@ public class ExecutorListenerMock {
                     e.printStackTrace();
                 }
             });
-            resultFuture.get();
         }
-        Thread.sleep(5000);
+        Thread.sleep(10000);
+    }
+
+    /**
+     * mock使用过程中需要的注意事项 -> 重写Listener的taskThresholdTrigger, 队列任务达到自定义阈值线程成功回调此方法
+     *  note: 如果使用submit方法并在主线程中get阻塞等待，则无法mock此功能
+     */
+    public static void mockQueueTaskCustomThresholdTrigger() throws InterruptedException, ExecutionException {
+        System.setProperty("dynamic.threadpool.testExecutor.corePoolSize", "2");
+        System.setProperty("dynamic.threadpool.testExecutor.maximumPoolSize", "2");
+        System.setProperty("dynamic.threadpool.testExecutor.queueType", QueueTypeConst.LinkedBlockingQueue);
+        System.setProperty("dynamic.threadpool.testExecutor.maxQueueSize", "10");
+        System.setProperty("dynamic.threadpool.testExecutor.queueWarningLoadFactor", "0.8");
+        System.setProperty("dynamic.threadpool.testExecutor.queueThresholdValveOpenRollingWindowInMinutes", "1");
+
+        DynamicThreadPoolKey threadPoolKey = DynamicThreadPoolKey.Factory.asKey("testExecutor");
+        DynamicThreadPoolExecutor executorService = (DynamicThreadPoolExecutor) DynamicThreadPoolManager.getInstance().getExecutorOrCreateDefault(threadPoolKey);
+        MockExecutorListener listener = new MockExecutorListener();
+        DynamicThreadPoolManager.getInstance().addExecutorListener(threadPoolKey, listener);
+
+        int i = 10;
+        while (i-- > 0) {
+            executorService.execute(() -> {
+                System.out.println(threadPoolKey + "线程池实例 | 当前线程名: " + Thread.currentThread().getName());
+                try {
+                    Thread.sleep(70000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            });
+        }
+        Thread.sleep(60000);
+        i = 2;
+        while (i-- > 0) {
+            executorService.execute(() -> {
+                System.out.println(threadPoolKey + "线程池实例 | 当前线程名: " + Thread.currentThread().getName());
+                try {
+                    Thread.sleep(2000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            });
+        }
+        Thread.sleep(80000);
     }
 
     /**
@@ -193,7 +236,7 @@ public class ExecutorListenerMock {
 
         @Override
         public void taskThresholdTrigger(int threshold, float loadFactor, int waitingTask) {
-            System.out.println("队列负载触发阈值 | threshold: " + threshold + "loadFactor: " + loadFactor + "waitingTask: " + waitingTask);
+            System.out.println("队列负载触发阈值 | threshold: " + threshold + ", loadFactor: " + loadFactor + ", waitingTask: " + waitingTask);
         }
     }
 }

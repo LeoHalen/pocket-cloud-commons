@@ -76,6 +76,11 @@ public class DynamicThreadPoolProperties {
     private final float defaultQueueWarningLoadFactor = 1F;
 
     /**
+     * 队列负载阈值阀门打开分钟级滚动窗口, 默认为5分钟
+     */
+    private final long defaultQueueThresholdValveOpenRollingWindowInMinutes = 5;
+
+    /**
      * 队列容量告警阀值, 默认为队列容量
      */
 //    private final int defaultQueueSizeWarningThreshold = (int) (defaultMaxQueueSize * defaultQueueWarningLoadFactor);
@@ -100,6 +105,7 @@ public class DynamicThreadPoolProperties {
     private final ThreadPoolProperty<Boolean> fair;
     private final ThreadPoolProperty<String> rejectedExecutionType;
     private final ThreadPoolProperty<Float> queueWarningLoadFactor;
+    private final ThreadPoolProperty<Long> queueThresholdValveOpenRollingWindowInMinutes;
     private final ThreadPoolProperty<Boolean> preheatEnabled;
 //    private final ThreadPoolProperty<Boolean> allowMaximumSizeToDivergeFromCoreSize;
 //    private final ThreadPoolProperty<Integer> threadPoolRollingNumberStatisticalWindowInMilliseconds;
@@ -121,8 +127,11 @@ public class DynamicThreadPoolProperties {
         this.queueType = getProperty(propertyPrefix, key, "queueType", builder.getQueueType(), defaultQueueType);
         this.maxQueueSize = getProperty(propertyPrefix, key, "maxQueueSize", builder.getMaxQueueSize(), defaultMaxQueueSize);
         this.fair = getProperty(propertyPrefix, key, "fair", builder.getFair(), defaultFair);
-        this.queueWarningLoadFactor = getProperty(propertyPrefix, key, "queueWarningLoadFactor", builder.getQueueWarningLoadFactor(), defaultQueueWarningLoadFactor);
+        ThreadPoolProperty<Float> queueWarningLoadFactorProperty = getProperty(propertyPrefix, key, "queueWarningLoadFactor", builder.getQueueWarningLoadFactor(), defaultQueueWarningLoadFactor);
+        this.queueWarningLoadFactor = queueWarningLoadFactorProperty.get() > defaultQueueWarningLoadFactor ?
+                getProperty(propertyPrefix, key, "queueWarningLoadFactor", defaultQueueWarningLoadFactor, defaultQueueWarningLoadFactor) : queueWarningLoadFactorProperty;
         this.rejectedExecutionType = getProperty(propertyPrefix, key, "rejectedExecutionType", builder.getRejectedExecutionType(), defaultRejectedExecutionType);
+        this.queueThresholdValveOpenRollingWindowInMinutes = getProperty(propertyPrefix, key, "queueThresholdValveOpenRollingWindowInMinutes", builder.getQueueThresholdValveOpenRollingWindowInMinutes(), defaultQueueThresholdValveOpenRollingWindowInMinutes);
         this.preheatEnabled = getProperty(propertyPrefix, key, "preheatEnabled", builder.getPreheatEnabled(), defaultPreheatEnabled);
     }
 
@@ -184,6 +193,7 @@ public class DynamicThreadPoolProperties {
         private Boolean fair;
         private String rejectedExecutionType = null;
         private Float queueWarningLoadFactor = null;
+        private Long queueThresholdValveOpenRollingWindowInMinutes = null;
         private Boolean preheatEnabled = null;
 
         /* package */ Setter() {
@@ -237,6 +247,11 @@ public class DynamicThreadPoolProperties {
 
         public Setter withQueueWarningLoadFactor(float value) {
             this.queueWarningLoadFactor = value;
+            return this;
+        }
+
+        public Setter withQueueThresholdValveOpenRollingWindowInMinutes(long value) {
+            this.queueThresholdValveOpenRollingWindowInMinutes = value;
             return this;
         }
 

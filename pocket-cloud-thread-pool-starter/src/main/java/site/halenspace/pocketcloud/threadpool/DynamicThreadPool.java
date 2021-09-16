@@ -80,20 +80,9 @@ public interface DynamicThreadPool {
         public DynamicThreadPoolDefault(DynamicThreadPoolKey threadPoolKey, DynamicThreadPoolProperties.Setter builder, ExecutorListener listener) {
             this.threadPoolKey = threadPoolKey;
             this.properties = DynamicThreadPoolPropertiesFactory.getThreadPoolProperties(threadPoolKey, builder);
-            this.threadPoolExecutor = DynamicThreadPoolFactory.getInstance().getThreadPoolExecutor(threadPoolKey, this.properties);
-            this.preheatAllCoreThreads();
+            this.threadPoolExecutor = DynamicThreadPoolFactory.getInstance().getThreadPoolExecutor(threadPoolKey, this.properties, listener);
             this.workingQueue = this.threadPoolExecutor.getQueue();
             this.queueSize = this.properties.getMaxQueueSize().get();
-        }
-
-        public void preheatAllCoreThreads() {
-            if (!this.properties.getPreheatEnabled().get()) {
-                return;
-            }
-            if (log.isDebugEnabled()) {
-                log.debug("Dynamic thread pool preheat for: {} preheat all core threads", threadPoolKey.name());
-            }
-            this.threadPoolExecutor.prestartAllCoreThreads();
         }
 
         @Override
