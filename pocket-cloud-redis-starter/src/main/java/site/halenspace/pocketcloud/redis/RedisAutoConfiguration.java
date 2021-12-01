@@ -129,8 +129,8 @@ public class RedisAutoConfiguration {
         Map<String, RedisCacheConfiguration> redisCacheConfigurations = new HashMap<>(configSize);
         if (configSize > 0) {
             cacheManagerProperties.getConfigs().forEach(cacheConfig -> {
-                RedisCacheConfiguration conf = getDefaultCacheConfiguration(
-                        redisKeySerializer, redisValueSerializer).entryTtl(Duration.ofSeconds(cacheConfig.getExpire()));
+                RedisCacheConfiguration conf = getDefaultCacheConfiguration(redisKeySerializer, redisValueSerializer)
+                        .entryTtl(Duration.ofSeconds(cacheConfig.getExpire()));
                 redisCacheConfigurations.put(cacheConfig.getKey(), conf);
             });
         }
