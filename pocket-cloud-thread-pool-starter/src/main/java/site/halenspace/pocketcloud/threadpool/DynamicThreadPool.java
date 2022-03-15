@@ -18,9 +18,9 @@ import java.util.concurrent.RejectedExecutionHandler;
 public interface DynamicThreadPool {
 
     /**
-     * Implementation of {@link DynamicThreadPoolExecutor}.
+     * Implementation of {@link DynamicThreadPoolDefault}.
      *
-     * @return DynamicThreadPoolExecutor
+     * @return ExecutorService
      */
     ExecutorService getExecutor();
 
@@ -134,5 +134,20 @@ public interface DynamicThreadPool {
 //                ((SynchronousQueue<Runnable>) threadPool.getQueue()).
 //            }
         }
+    }
+
+    public static void main(String[] args) {
+        /*for (int i = 1, n = 1001, x = 0; i < n; i++) {
+            System.out.print(x + "^" + (i) + "=");
+            x = x ^ i;
+            System.out.println(x);
+        }*/
+
+        int n = 7, count = 0;
+        while (n != 0) {
+            n &= n - 1;
+            count++;
+        }
+        System.out.println(count);
     }
 }
