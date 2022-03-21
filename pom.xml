@@ -13,6 +13,7 @@
         <module>pocket-cloud-logs-starter</module>
         <module>pocket-cloud-thread-pool-starter</module>
         <module>pocket-cloud-request-control-starter</module>
+        <module>thread-pool-common</module>
     </modules>
     <packaging>pom</packaging>
 

@@ -1,12 +1,10 @@
-package site.halenspace.pocketcloud.threadpool;
+package site.halenspace.pocket.threadpool;
 
 import lombok.extern.slf4j.Slf4j;
-import site.halenspace.pocketcloud.threadpool.builder.RejectedExecutionBuilder;
-import site.halenspace.pocketcloud.threadpool.consts.QueueTypeConst;
-import site.halenspace.pocketcloud.threadpool.queue.ResizableLinkedBlockingQueue;
-import site.halenspace.pocketcloud.threadpool.strategy.properties.DynamicThreadPoolProperties;
-import site.halenspace.pocketcloud.threadpool.strategy.properties.factory.DynamicThreadPoolPropertiesFactory;
-
+import site.halenspace.pocket.threadpool.builder.RejectedExecutionBuilder;
+import site.halenspace.pocket.threadpool.properties.strategy.DynamicThreadPoolProperties;
+import site.halenspace.pocket.threadpool.properties.factory.DynamicThreadPoolPropertiesFactory;
+import site.halenspace.pocket.threadpool.queue.ResizableLinkedBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
