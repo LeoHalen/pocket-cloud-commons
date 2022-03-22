@@ -19,7 +19,7 @@ public abstract class ThreadPoolPropertiesStrategy {
      * @param threadPoolKey
      *            {@link DynamicThreadPoolKey} representing the name or type of {@link site.halenspace.pocket.threadpool.DynamicThreadPool}
      * @param builder
-     *            {@link DynamicThreadPoolProperties.Setter} with default overrides as injected via {@link } to the {@link site.halenspace.pocketcloud.threadpool.DynamicThreadPool} implementation.
+     *            {@link DynamicThreadPoolProperties.Setter} with default overrides as injected via {@link } to the {@link site.halenspace.pocket.threadpool.DynamicThreadPool} implementation.
      *            <p>
      *            The builder will return NULL for each value if no override was provided.
      *
@@ -34,7 +34,7 @@ public abstract class ThreadPoolPropertiesStrategy {
      * <p>
      * Typically this would return <code>DynamicThreadPoolKey.name()</code> but can be done differently if required.
      * <p>
-     * For example, null can be returned which would cause it to not cache and invoke {@link #getThreadPoolProperties} for each {@link site.halenspace.pocketcloud.threadpool.DynamicThreadPool} instantiation (not recommended).
+     * For example, null can be returned which would cause it to not cache and invoke {@link #getThreadPoolProperties} for each {@link site.halenspace.pocket.threadpool.DynamicThreadPool} instantiation (not recommended).
      * <p>
      * <b>Default Implementation</b>
      * <p>

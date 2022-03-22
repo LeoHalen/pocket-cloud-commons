@@ -15,7 +15,7 @@ public class DynamicThreadPoolPropertiesFactory {
     private static final ConcurrentHashMap<String, DynamicThreadPoolProperties> threadPoolPropertiesMap = new ConcurrentHashMap<>();
 
     /**
-     * Get an instance of {@link DynamicThreadPoolProperties} with the given factory {@link ThreadPoolPropertiesStrategy} implementation for each {@link site.halenspace.pocketcloud.threadpool.DynamicThreadPool} instance.
+     * Get an instance of {@link DynamicThreadPoolProperties} with the given factory {@link ThreadPoolPropertiesStrategy} implementation for each {@link site.halenspace.pocket.threadpool.DynamicThreadPool} instance.
      *
      * @param key
      *            Pass-thru to {@link ThreadPoolPropertiesStrategy#getThreadPoolProperties} implementation.

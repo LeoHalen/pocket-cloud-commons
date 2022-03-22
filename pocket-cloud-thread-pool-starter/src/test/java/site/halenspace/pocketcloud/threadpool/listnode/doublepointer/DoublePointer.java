@@ -1,4 +1,6 @@
-package site.halenspace.pocketcloud.threadpool.doublepointer;
+package site.halenspace.pocketcloud.threadpool.listnode.doublepointer;
+
+import site.halenspace.pocketcloud.threadpool.listnode.ListNode;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -156,33 +158,90 @@ public class DoublePointer {
      *  那么fast 一定比 slow 多走了 k 步，这多走的 k 步其实就是 fast 指针在环里转圈圈，所以 k 的值就是环长度的「整数倍」。
      * （2）假设相遇点距环的起点的距离为 m，那么结合上图的 slow 指针，环的起点距头结点 head 的距离为 k - m，也就是说如果从 head 前进 k - m 步就能到达环起点。
      * （3）巧的是，如果从相遇点继续前进 k - m 步，也恰好到达环起点。因为结合上图的 fast 指针，从相遇点开始走k步可以转回到相遇点，那走 k - m 步肯定就走到环起点了
+     * 时间复杂度: 最坏时间复杂度为O(N)
      * @param head
      * @return
      */
     public ListNode detectCycle(ListNode head) {
         ListNode slow = head, fast = head;
+        int meetCount = 0;
         while (fast != null && fast.next != null) {
-            slow = slow.next;
-            fast = fast.next.next;
-            if (slow == fast) {
-
+            if (meetCount == 0) {
+                // 第一次相遇前为快慢指针
+                slow = slow.next;
+                fast = fast.next.next;
+                if (slow == fast) {
+                    // 第一次相遇将slow指向链表头部，并标记相遇第一次
+                    slow = head;
+                    meetCount++;
+                }
+            } else {
+                if (slow == fast) {
+                    // 第二次相遇点则为环入口节点
+                    return slow;
+                }
+                // 第二次相遇前为同步指针
+                slow = slow.next;
+                fast = fast.next;
             }
         }
 
         return null;
     }
 
-    public static class ListNode {
-        int val;
-        ListNode next;
-        ListNode() {}
-        ListNode(int val) {
-            this.val = val;
+    ListNode detectCycleTemp(ListNode head) {
+        ListNode fast, slow;
+        fast = slow = head;
+        while (fast != null && fast.next != null) {
+            fast = fast.next.next;
+            slow = slow.next;
+            if (fast == slow) break;
         }
-        ListNode(int val, ListNode next) {
-            this.val = val;
-            this.next = next;
+        // 上面的代码类似 hasCycle 函数
+        if (fast == null || fast.next == null) {
+            // fast 遇到空指针说明没有环
+            return null;
         }
+
+        // 重新指向头结点
+        slow = head;
+        // 快慢指针同步前进，相交点就是环起点
+        while (slow != fast) {
+            fast = fast.next;
+            slow = slow.next;
+        }
+        return slow;
+    }
+
+    /**
+     * 160. 相交链表
+     * 解题思路: 如果两个链表有相交，有个特点就是p1指针遍历链表1再遍历链表2，同时p2先遍历链表2再遍历链表1，那么两个指针总会在第二次遍历
+     *  时在交点相遇。
+     * 时间复杂度: 最坏时间复杂度O(m+n)，m,n为两条链表的长度
+     * @param headA
+     * @param headB
+     * @return
+     */
+    public ListNode getIntersectionNode(ListNode headA, ListNode headB) {
+        ListNode p1 = headA, p2 = headB;
+        int p1Count = 0, p2Count = 0;
+        while (p1 != null && p2 != null) {
+            if (p1 == p2) {
+                return p1;
+            }
+            p1 = p1.next;
+            p2 = p2.next;
+            if (p1 == null && p1Count == 0) {
+                p1 = headB;
+                p1Count++;
+            }
+            if (p2 == null && p2Count == 0) {
+                p2 = headA;
+                p2Count++;
+            }
+        }
+
+        return null;
     }
 
     public static void main(String[] args) {
@@ -200,8 +259,13 @@ public class DoublePointer {
 //        new DoublePointer().mergeTwoLists(listNode1, listNode2);
 
         // test removeNthFromEnd
-        ListNode listNode1 = new ListNode(1);
-        new DoublePointer().removeNthFromEnd(listNode1, 1);
+//        ListNode listNode = new ListNode(1);
+//        new DoublePointer().removeNthFromEnd(listNode, 1);
+
+        // test detectCycle
+        ListNode listNode = new ListNode(1);
+        listNode.next = listNode;
+        new DoublePointer().detectCycle(listNode);
     }
 
 }
