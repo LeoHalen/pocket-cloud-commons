@@ -134,4 +134,38 @@ public class ListNodeReverse {
         left = left.next;
         return result;
     }
+
+    /**
+     * 234. 回文链表
+     * 解法2思路：利用快慢指针寻找到中间节点，然后反转后半部分链表，然后遍历前半部分链表和反转后的后半部分链表是否相等
+     * 时间复杂度：O(n), n 为链表元素个数
+     * 空间复杂度：O(1)
+     * @param head
+     * @return
+     */
+    public boolean isPalindromeImprove(ListNode head) {
+        // 使用快慢指针寻找链表的中点
+        ListNode slow = head, fast = head;
+        while (fast != null && fast.next != null) {
+            slow = slow.next;
+            fast = fast.next.next;
+        }
+        if (fast != null) {
+            // fast 不为null说明链表长度为奇数长度，所以slow要再向前一步
+            slow = slow.next;
+        }
+
+        ListNode left = head;
+        // 从slow开始反转链表
+        ListNode right = iteReverseAll(slow);
+        while (right != null) {
+            if (left.val != right.val) {
+                return false;
+            }
+            left = left.next;
+            right = right.next;
+        }
+
+        return true;
+    }
 }
