@@ -27,5 +27,11 @@
             <artifactId>junit</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
+            <!-- 注意，若无type为jar则报错-->
+            <type>jar</type>
+        </dependency>
     </dependencies>
 </project>
