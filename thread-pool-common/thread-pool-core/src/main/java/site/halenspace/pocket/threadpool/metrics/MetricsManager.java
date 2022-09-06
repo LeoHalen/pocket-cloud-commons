@@ -126,11 +126,11 @@ public class MetricsManager {
                 .build()
                 .start();
 
-//        LocateRegistry.createRegistry(8081);
-//        JMXServiceURL url = new JMXServiceURL
-//                ("service:jmx:rmi:///jndi/rmi://localhost:8081/jmxrmi");
-//        JMXConnectorServer jcs = JMXConnectorServerFactory.newJMXConnectorServer(url, null, server);
-//        jcs.start();
+        LocateRegistry.createRegistry(8081);
+        JMXServiceURL url = new JMXServiceURL
+                ("service:jmx:rmi:///jndi/rmi://localhost:8081/jmxrmi");
+        JMXConnectorServer jcs = JMXConnectorServerFactory.newJMXConnectorServer(url, null, server);
+        jcs.start();
 
         Thread.sleep(60000 * 10);
     }
