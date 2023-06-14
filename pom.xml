@@ -60,7 +60,7 @@
 
         <!-- tool -->
         <hutool-core.version>5.7.2</hutool-core.version>
-        <guava.version>30.1.1-jre</guava.version>
+        <guava.version>32.0.0-jre</guava.version>
         <commons-lang3.version>3.12.0</commons-lang3.version>
         <lombok.version>1.18.24</lombok.version>
         <metrics.version>4.2.11</metrics.version>
